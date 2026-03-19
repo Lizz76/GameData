@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏资讯库</title>
+<style>
+:root {
+  --bg: #e3d7c6;
+  --paper: rgba(249, 244, 236, 0.96);
+  --line: rgba(90, 63, 41, 0.16);
+  --ink: #1f1914;
+  --muted: #6f6358;
+  --accent: #8d4331;
+  --accent-deep: #5d281d;
+  --olive: #58684a;
+  --shadow: 0 20px 48px rgba(49, 32, 18, 0.1);
+  --shadow-soft: 0 8px 20px rgba(49, 32, 18, 0.06);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255, 249, 241, 0.9), transparent 28%),
+    linear-gradient(180deg, rgba(253, 247, 239, 0.78), rgba(227, 215, 198, 0.98)),
+    repeating-linear-gradient(90deg, rgba(114, 88, 62, 0.032) 0 1px, transparent 1px 30px),
+    var(--bg);
+  overflow-x: hidden;
+}
+.page { width: 100%; max-width: 1720px; margin: 0 auto; padding: 22px; }
+.shell { border: 1px solid rgba(90, 63, 41, 0.12); border-radius: 30px; background: var(--paper); box-shadow: var(--shadow); overflow: hidden; }
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 30px 24px;
+  background: linear-gradient(135deg, rgba(22, 17, 13, 0.96), rgba(64, 36, 28, 0.94)), radial-gradient(circle at top right, rgba(226, 194, 170, 0.26), transparent 28%);
+  color: #f8f1e8;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -32px -58px auto;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(226, 194, 170, 0.24), transparent 68%);
+}
+.hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(340px, 0.95fr); gap: 22px; align-items: end; }
+.hero-kicker { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(242, 228, 214, 0.74); }
+.hero-kicker::before { content: ""; width: 28px; height: 1px; background: rgba(242, 228, 214, 0.56); }
+.hero h1 { margin: 0; font-family: "STSong", "Songti SC", "Noto Serif SC", serif; font-size: clamp(38px, 5vw, 70px); line-height: 1; letter-spacing: -0.05em; }
+.hero-meta { margin-top: 14px; display: inline-flex; flex-wrap: wrap; gap: 10px; }
+.hero-meta-item {
+  display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px;
+  background: rgba(255, 250, 243, 0.08); border: 1px solid rgba(242, 228, 214, 0.12); color: rgba(248, 241, 232, 0.82); font-size: 12px;
+}
+.hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 16px; border-radius: 22px; border: 1px solid rgba(242, 228, 214, 0.16); background: rgba(248, 241, 232, 0.08); }
+.stat { padding: 14px 12px; border-radius: 16px; border: 1px solid rgba(242, 228, 214, 0.12); background: rgba(255, 250, 243, 0.08); }
+.stat-label { display: block; margin-bottom: 10px; font-size: 12px; color: rgba(242, 228, 214, 0.72); }
+.stat-value { display: block; font-family: "STSong", "Songti SC", "Noto Serif SC", serif; font-size: clamp(28px, 3vw, 40px); font-weight: 700; letter-spacing: -0.03em; }
+.toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 18px 22px 14px; border-bottom: 1px solid var(--line); background: rgba(253, 249, 242, 0.92); }
+.search { position: relative; }
+.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
+.search input { width: 100%; border: 1px solid rgba(90, 63, 41, 0.18); border-radius: 999px; padding: 14px 16px 14px 46px; font-size: 14px; outline: none; background: rgba(255, 252, 247, 0.96); }
+.search input:focus { border-color: rgba(141, 67, 49, 0.4); box-shadow: 0 0 0 4px rgba(141, 67, 49, 0.08); }
+.toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.button { border: 1px solid transparent; border-radius: 999px; padding: 13px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }
+.button.primary { color: #fff8f1; background: linear-gradient(135deg, var(--accent), var(--accent-deep)); }
+.button.ghost { color: var(--ink); background: rgba(255, 252, 247, 0.88); border-color: rgba(90, 63, 41, 0.15); }
+.button.is-selected { color: #fff8f1; background: linear-gradient(135deg, var(--accent), var(--accent-deep)); }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 22px 18px; border-bottom: 1px solid var(--line); background: rgba(253, 249, 242, 0.92); }
+.chip-label { margin-right: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: var(--muted); }
+.chip { border: 1px solid rgba(90, 63, 41, 0.14); border-radius: 999px; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; background: rgba(255, 252, 247, 0.84); color: var(--ink); }
+.chip.is-active, .chip:hover { background: var(--ink); color: #f7efe7; border-color: var(--ink); }
+.summary { display: flex; justify-content: space-between; gap: 12px; padding: 12px 22px 14px; background: rgba(239, 229, 215, 0.56); border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.summary strong { color: var(--ink); letter-spacing: normal; text-transform: none; }
+.workspace { position: relative; }
+.library-pane { min-width: 0; padding-right: 396px; }
+.cards { padding: 22px; display: grid; gap: 16px; }
+.game-card { position: relative; border: 1px solid rgba(90, 63, 41, 0.14); border-radius: 24px; background: linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(248, 240, 231, 0.98)); box-shadow: var(--shadow-soft); padding: 18px 18px 16px; content-visibility: auto; contain-intrinsic-size: 360px; }
+.game-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: linear-gradient(180deg, var(--accent), rgba(141, 67, 49, 0.12)); }
+.game-card.is-played::after { content: ""; position: absolute; inset: 10px 10px auto auto; width: 12px; height: 12px; border-radius: 50%; background: var(--olive); box-shadow: 0 0 0 4px rgba(88, 104, 74, 0.14); }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 14px; }
+.card-topline { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; min-height: 30px; }
+.played-flag { display: none; align-items: center; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #f4fbef; background: var(--olive); }
+.game-card.is-played .played-flag, .game-card.is-played .title-check { display: inline-flex; }
+.card-title-wrap h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-family: "STSong", "Songti SC", "Noto Serif SC", serif; font-size: clamp(24px, 2.1vw, 30px); line-height: 1.06; }
+.title-check { display: none; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(88, 104, 74, 0.14); color: var(--olive); font-size: 16px; font-weight: 800; }
+.card-subline, .playlist-item-meta { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 12px; }
+.meta-pill { display: inline-flex; align-items: center; padding: 7px 11px; border-radius: 999px; background: rgba(255, 252, 247, 0.92); border: 1px solid rgba(90, 63, 41, 0.12); }
+.card-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 7px; background: rgba(255, 248, 240, 0.86); border: 1px solid rgba(90, 63, 41, 0.12); font-size: 12px; font-weight: 700; }
+.badge-primary, .playlist-tag { background: rgba(141, 67, 49, 0.1); color: var(--accent-deep); }
+.card-actions { margin-bottom: 14px; }
+.mini-action { border: 1px solid rgba(90, 63, 41, 0.14); border-radius: 999px; padding: 8px 12px; background: rgba(255, 252, 247, 0.86); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
+.field-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; }
+.field { grid-column: span 4; padding: 14px 15px; border-radius: 18px; background: rgba(255, 252, 247, 0.82); border: 1px solid rgba(90, 63, 41, 0.11); }
+.field-wide { grid-column: span 6; }
+.field-compact { grid-column: span 2; }
+.field-highlight { background: linear-gradient(180deg, rgba(226, 194, 170, 0.24), rgba(255, 252, 247, 0.94)); }
+.field-warning { background: linear-gradient(180deg, rgba(31, 25, 20, 0.05), rgba(255, 252, 247, 0.94)); }
+.field-label { margin-bottom: 10px; font-size: 11px; font-weight: 800; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; }
+.field-value { font-size: 14px; line-height: 1.75; word-break: break-word; }
+.link-pill, .shot-pill { display: inline-flex; align-items: center; gap: 6px; padding: 9px 13px; border-radius: 999px; text-decoration: none; font-weight: 700; border: 1px solid transparent; }
+.link-pill { color: var(--accent-deep); background: rgba(141, 67, 49, 0.1); border-color: rgba(141, 67, 49, 0.12); }
+.shot-pill { color: var(--ink); background: rgba(31, 25, 20, 0.06); border-color: rgba(31, 25, 20, 0.08); }
+.playlist-pane {
+  position: fixed;
+  right: max(18px, calc((100vw - 1720px) / 2 + 22px));
+  bottom: 18px;
+  width: min(360px, calc(100vw - 24px));
+  z-index: 20;
+}
+.playlist-shell { border: 1px solid rgba(90, 63, 41, 0.14); border-radius: 24px; background: rgba(253, 249, 242, 0.98); box-shadow: var(--shadow-soft); overflow: hidden; }
+.playlist-head { padding: 18px 18px 14px; border-bottom: 1px solid rgba(90, 63, 41, 0.1); background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(246, 239, 229, 0.92)); }
+.playlist-kicker { margin-bottom: 10px; font-size: 11px; letter-spacing: 0.18em; color: var(--muted); }
+.playlist-title { margin: 0; font-family: "STSong", "Songti SC", "Noto Serif SC", serif; font-size: 28px; line-height: 1.05; }
+.playlist-note { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.playlist-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.playlist-stat { padding: 12px 12px 10px; border-radius: 16px; border: 1px solid rgba(90, 63, 41, 0.1); background: rgba(255, 252, 247, 0.86); }
+.playlist-stat-label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 11px; letter-spacing: 0.08em; }
+.playlist-stat-value { display: block; font-size: 24px; font-weight: 800; color: var(--ink); }
+.playlist-actions { display: flex; gap: 10px; padding: 14px 18px 14px; }
+.playlist-actions button { flex: 1; }
+.playlist-list { list-style: none; margin: 0; padding: 0 10px 10px; display: flex; flex-direction: column; gap: 10px; max-height: min(46vh, 440px); overflow: auto; }
+.playlist-empty { padding: 2px 18px 18px; color: var(--muted); font-size: 13px; }
+.playlist-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 14px; border-radius: 18px; border: 1px solid rgba(90, 63, 41, 0.12); background: rgba(255, 252, 247, 0.9); }
+.playlist-item.is-played { border-color: rgba(88, 104, 74, 0.24); background: rgba(240, 247, 235, 0.9); }
+.playlist-check { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--olive); cursor: pointer; }
+.playlist-item-main { min-width: 0; }
+.playlist-item-name { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0; font-size: 15px; font-weight: 800; }
+.playlist-item.is-played .playlist-item-name { color: var(--olive); }
+.playlist-tag { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.playlist-remove { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px; }
+.footer { padding: 14px 22px 22px; color: var(--muted); font-size: 12px; text-align: right; letter-spacing: 0.08em; }
+.hidden { display: none !important; }
+@media (max-width: 1260px) {
+  .library-pane { padding-right: 0; }
+  .playlist-pane { position: static; width: auto; padding: 0 22px 22px; }
+  .playlist-list { max-height: none; }
+}
+@media (max-width: 920px) {
+  .hero-grid, .toolbar, .hero-stats, .playlist-stats { grid-template-columns: 1fr; }
+  .card-head { flex-direction: column; }
+  .field, .field-wide, .field-compact { grid-column: span 12; }
+}
+@media (max-width: 640px) {
+  .page { padding: 10px; }
+  .shell { border-radius: 20px; }
+  .hero, .toolbar, .chip-row, .summary, .cards, .playlist-pane, .footer { padding-left: 14px; padding-right: 14px; }
+  .summary { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-kicker">CURATED PLAY INDEX</div>
+          <h1>游戏资讯库</h1>
+          <div class="hero-meta">
+            <span class="hero-meta-item">点击卡片按钮加入游玩清单</span>
+            <span class="hero-meta-item">勾选后会同步显示已玩标记</span>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-label">游戏总数</span><span class="stat-value" id="gameCount">84</span></div>
+          <div class="stat"><span class="stat-label">题材大类</span><span class="stat-value" id="categoryCount">8</span></div>
+          <div class="stat"><span class="stat-label">当前显示</span><span class="stat-value" id="visibleCount">84</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search"><span class="search-icon">⌕</span><input id="searchInput" type="text" placeholder="搜索游戏名、题材、玩法、亮点、开发商..."></div>
+      <div class="toolbar-actions">
+        <button id="sortButton" class="button ghost is-selected" type="button" onclick="toggleSortOrder()">时间排序 ↓</button>
+        <button class="button primary" type="button" onclick="filterNow()">搜索</button>
+        <button class="button ghost" type="button" onclick="resetAll()">重置</button>
+      </div>
+    </section>
+
+    <section class="chip-row"><span class="chip-label">标准题材</span><button class="chip is-active" type="button" onclick="filterByCategory('', this)">全部</button>
+<button class="chip" type="button" data-category="三国" onclick="filterByCategory(this.dataset.category, this)">三国</button>
+<button class="chip" type="button" data-category="其他" onclick="filterByCategory(this.dataset.category, this)">其他</button>
+<button class="chip" type="button" data-category="历史/中世纪" onclick="filterByCategory(this.dataset.category, this)">历史/中世纪</button>
+<button class="chip" type="button" data-category="奇幻/魔幻" onclick="filterByCategory(this.dataset.category, this)">奇幻/魔幻</button>
+<button class="chip" type="button" data-category="末日生存" onclick="filterByCategory(this.dataset.category, this)">末日生存</button>
+<button class="chip" type="button" data-category="现代战争" onclick="filterByCategory(this.dataset.category, this)">现代战争</button>
+<button class="chip" type="button" data-category="科幻" onclick="filterByCategory(this.dataset.category, this)">科幻</button>
+<button class="chip" type="button" data-category="经营模拟" onclick="filterByCategory(this.dataset.category, this)">经营模拟</button></section>
+    <div class="summary"><span>数据源：<strong>games_data.json</strong></span><span>最后同步：<strong>2026-03-19 18:57:08</strong></span></div>
+
+    <section class="workspace">
+      <div class="library-pane"><main class="cards" id="cardsRoot">
+<article class="game-card" data-game-id="game-94db617c7f" data-category="三国" data-release-date="2019-09-20">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>三国志·战略版</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">广州灵犀互动娱乐有限公司（阿里互娱）</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2019-09-20</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">写实国风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-94db617c7f')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://sgzzlb.lingxigames.com/" target="_blank" rel="noopener noreferrer">https://sgzzlb.lingxigames.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">赛季制大地图沙盘 SLG，真实地形规则，同盟攻城掠地，武将搭配战斗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.地形规则设计优秀：真实山川河流影响行军路线和战斗，增加策略深度；2.赛季制循环成熟：每 2-3 个月重置地图，保持新鲜感同时保留武将养成；3.同盟社交体系完善：从盟主到成员层级清晰，攻城协作机制流畅；4.武将搭配深度高：技能组合、兵种克制、缘分系统形成丰富 Build</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费数值差距大：核心武将和战法抽取成本高，大 R 碾压明显；2.新手追赶机制弱：新玩家进入老服生存空间小；3.肝度过高：攻城战时间固定，上班族难以参与；4.阵容固化：T0 阵容垄断严重，多样性不足</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-cd0c883253" data-category="三国" data-release-date="2015-10-22">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>率土之滨</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">网易游戏</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2015-10-22</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">写实国风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-cd0c883253')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://stzb.163.com/" target="_blank" rel="noopener noreferrer">https://stzb.163.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">赛季制大地图沙盘 SLG，自由武将搭配，资源争夺，州战同盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.自由武将搭配系统：无星级限制，低星武将也有上场空间；2.资源地争夺机制：地块产出差异化，战略要地争夺激烈；3.州战系统设计：跨州征战节奏把控好，赛季末高潮设计合理；4.战法组合深度：300+ 战法形成丰富搭配可能性</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.开荒周期过长：新手期 48 小时压力大，流失率高；2.匹配机制问题：实力相近玩家匹配不够精准；3.老服生态固化：老牌同盟垄断资源，新同盟难以崛起；4.界面 UI 老旧：操作体验不如新产品流畅</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-797c34099e" data-category="历史/中世纪" data-release-date="2020-09-23">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>万国觉醒</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">莉莉丝游戏</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2020-09-23</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通欧美风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-797c34099e')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://rok.lilith.com/" target="_blank" rel="noopener noreferrer">https://rok.lilith.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">自由行军 SLG，文明选择，武将搭配，地图探索，联盟 KVK 战役</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.自由行军机制创新：实时调整行军路线，战术灵活性高；2.多文明差异化设计：14 个文明特色技能、兵种、建筑不同；3.KVK 跨服战设计：赛季制竞技，奖励丰厚，参与感强；4.新手保护机制：新手护盾、资源保护设计合理</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.肝度较高：日常任务、活动参与时间长；2.付费深度大：武将、装备、资源全面付费；3.平衡性问题：部分文明强度超标；4.后期玩法单一：赛季末内容匮乏</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-37eaff37a0" data-category="末日生存" data-release-date="2022-12-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Whiteout Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Century Games Pte. Ltd.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2022-12-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实冰雪末日风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-37eaff37a0')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/whiteout-survival/id6443575749" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/whiteout-survival/id6443575749<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">冰雪末日SLG，避难所建设，资源管理，联盟协作，PVP对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化明显：冰雪末日题材新颖，视觉识别度高；2.资源循环设计：煤炭、食物、木材多维度资源管理；3.美术品质精良：冰雪场景、角色建模精细；4.新手体验优化：前期节奏舒缓，引导清晰</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法创新不足：核心循环与State of Survival相似；2.付费深度大：英雄、装备、资源全面付费；3.社交压力：联盟战强制参与，休闲玩家压力大；4.内容更新慢：活动重复度高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-a8975b3eb6" data-category="其他" data-release-date="2025-03-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>可狱不可囚（Lands of Jail）</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">SINGAPORE JUST GAME TECHNOLOGY PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-03-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">其他</span><span class="badge">卡通写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-a8975b3eb6')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/lands-of-jail/id6738469826" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/lands-of-jail/id6738469826<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">监狱题材 SLG，监狱建设，犯人管理，资源生产，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化创新：监狱管理题材罕见，视觉识别度极高；2.犯人管理系统：犯人分类、工作安排、改造系统独特；3.资源循环设计：犯人劳动产出资源，形成完整经济循环；4.2025 年新游：3 月上线，首月流水表现优异，增长趋势强劲</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材接受度待验证：监狱题材可能劝退部分玩家；2.用户规模有限：小众题材买量成本可能较高；3.玩法深度待观察：运营时间短，长期内容待验证；4.文化差异风险：海外市场对监狱题材接受度不确定</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-3c9a12d8c0" data-category="奇幻/魔幻" data-release-date="待公布（测试中）">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Palmon: Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">LILITH TECHNOLOGY HONG KONG LIMITED</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">待公布（测试中）</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">卡通奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-3c9a12d8c0')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/palmon-survival/id6739345737" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/palmon-survival/id6739345737<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">奇幻生物养成 SLG，Palmon 收集，基地建设，联盟协作，PVP 竞技</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.莉莉丝 2025 年新品：品质保证，全球发行能力强；2.奇幻生物养成：类似宝可梦的收集养成系统；3.SLG+ 养成融合：降低 SLG 门槛，扩大用户群；4.美术风格独特：清新卡通风格，吸引年轻用户</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法融合待验证：养成与 SLG 结合度需观察；2.目标用户待明确：养成玩家与 SLG 玩家重叠度；3.运营时间短：长期内容待验证；4.付费设计待观察：商业化模式需验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-0ddf5accbd" data-category="末日生存" data-release-date="2023-08-10">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Last War: Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">FUNFLY PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2023-08-10</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-0ddf5accbd')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.fun.lastwar.gp" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.fun.lastwar.gp<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代战争SLG，基地建设，指挥官系统，联盟战争，全球同服</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化：现代战争+末日融合，视觉风格独特；2.战斗节奏快：单局战斗3-5分钟，碎片化友好；3.新手引导优化：前期教学详细，上手门槛低；4.买量素材优秀：短视频素材转化率高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法深度不足：核心系统相对简单；2.内容更新频率低：新活动、新英雄推出慢；3.社交系统弱：联盟互动功能少；4.付费设计激进：礼包弹窗频繁</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-58cd32e5c0" data-category="末日生存" data-release-date="2020-08-25">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Puzzles &amp; Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">37GAMES</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2020-08-25</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">美式卡通写实</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-58cd32e5c0')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.global.ztmslg" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.global.ztmslg<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">三消+SLG融合玩法，基地建设，英雄养成，联盟系统，PVP战斗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.玩法融合创新：三消降低SLG门槛，扩大用户群；2.双循环设计：三消关卡+基地建设，满足不同玩家需求；3.女性用户友好：三消玩法吸引女性，占比超50%；4.付费设计优秀：Battle Pass、月卡、礼包组合合理</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.SLG深度较浅：核心玩家觉得不够硬核；2.三消重复性高：关卡设计缺乏变化；3.融合度待提升：两种玩法关联度不够强；4.后期内容不足：满级后玩法单一</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-9786528684" data-category="现代战争" data-release-date="2024-06-12">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Top Heroes: Kingdom Saga</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">RiverGame</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-06-12</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">美漫超级英雄风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-9786528684')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.greenmushroom.boomblitz.gp" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.greenmushroom.boomblitz.gp<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">超级英雄题材SLG，英雄收集养成，联盟战争，跨服竞技，PVP对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化：超级英雄题材新颖，视觉识别度高；2.英雄收集系统：漫威式英雄设计，吸引力强；3.美术品质优秀：美漫风格、角色建模精细；4.海外表现稳定：欧美市场接受度高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.版权风险：超级英雄形象可能存在版权纠纷；2.玩法深度不足：核心系统相对简单；3.用户规模有限：超级英雄受众有限；4.内容更新慢：新英雄、新活动推出频率低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-90f17ae6d9" data-category="现代战争" data-release-date="2024-09-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Kingshot</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Century Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-09-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-90f17ae6d9')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.centurygames.com/games/kingshot/" target="_blank" rel="noopener noreferrer">https://www.centurygames.com/games/kingshot/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代战争SLG，基地建设，指挥官系统，联盟战争，全球同服</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化：现代战争题材新颖，视觉风格独特；2.战斗节奏快：单局战斗3-5分钟，碎片化友好；3.新手引导优化：前期教学详细，上手门槛低；4.海外增长迅速：2024年Q4增长趋势良好</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法深度不足：核心系统相对简单；2.内容更新频率低：新活动、新指挥官推出慢；3.社交系统弱：联盟互动功能少；4.付费设计激进：礼包弹窗频繁</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-90b9ec2c17" data-category="末日生存" data-release-date="2019-11-14">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>State of Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">KingsGroup Holdings</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2019-11-14</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实末日风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-90b9ec2c17')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.stateofsurvival.com/" target="_blank" rel="noopener noreferrer">https://www.stateofsurvival.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">末日生存SLG，基地建设，英雄收集，联盟合作，PVP对抗，剧情推进</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.剧情驱动设计：主线章节推进，增强代入感；2.英雄收集系统：RPG元素融合，英雄技能、装备、升星完整；3.IP联动策略：与行尸走肉等IP联动，用户获取成本低；4.女性用户设计：剧情、美术风格吸引女性玩家，占比约35%</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法创新不足：核心循环与竞品相似；2.付费深度大：英雄抽取、装备强化成本高；3.数值平衡问题：部分英雄强度超标；4.后期内容匮乏：满级后玩法单一</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-c1379cf4b6" data-category="历史/中世纪" data-release-date="2016-05-16">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Evony: The King&#x27;s Return</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">TG Inc.</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2016-05-16</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实欧美中世纪风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-c1379cf4b6')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.evony.com/" target="_blank" rel="noopener noreferrer">https://www.evony.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">经典SLG玩法，多文明选择，城市建设，军队训练，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.长线运营成功：8年持续运营，用户生命周期管理成熟；2.多文明系统：7个文明特色差异化，策略选择丰富；3.广告投放策略：买量素材多样化，用户获取稳定；4.付费设计成熟：VIP、月卡、礼包组合合理，ARPU值高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面老旧：美术品质落后于新产品；2.玩法创新不足：核心循环多年未变；3.新手体验差：新玩家追赶困难；4.社交压力大：联盟战强制参与</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-13bf02f9f8" data-category="现代战争" data-release-date="2019-08-20">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Top War: Battle Game</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">River Game</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2019-08-20</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">卡通现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-13bf02f9f8')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.topwar.gp" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.topwar.gp<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">SLG+三消+合成玩法融合，基地建设，英雄养成，联盟系统</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.玩法融合创新：三消+合成+SLG，降低门槛扩大用户群；2.合成系统设计：装备、英雄合成提供持续成长目标；3.休闲与策略平衡：轻度玩家和重度玩家都有内容；4.用户获取成本低：休闲玩法吸引泛用户</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.SLG深度较浅：核心玩家觉得不够硬核；2.合成重复性高：后期合成枯燥；3.融合度待提升：三种玩法关联度不够强；4.付费设计激进：礼包弹窗频繁</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-2670c8632a" data-category="科幻" data-release-date="2021-03-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Age of Origins</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">CamelStudio</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2021-03-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">科幻写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-2670c8632a')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.camelgames.aoz" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.camelgames.aoz<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">科幻丧尸题材SLG，基地建设，英雄养成，联盟战争，跨服竞技</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化：科幻+丧尸融合，视觉风格独特；2.英雄系统设计：英雄技能、装备、羁绊完整；3.美术品质优秀：角色建模、场景精细；4.跨服竞技设计：跨服战、竞技场提供PVP内容</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材小众：科幻丧尸受众有限；2.用户获取难度大：买量成本高于传统SLG；3.玩法创新不足：核心循环与竞品相似；4.内容更新慢：新英雄、新活动推出频率低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-3fd6624aa5" data-category="历史/中世纪" data-release-date="2022-05-17">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Kingdoms of Heckfire</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Scopely</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2022-05-17</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通休闲风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-3fd6624aa5')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/kingdoms-of-heckfire/id1598683139" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/kingdoms-of-heckfire/id1598683139<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">休闲SLG，王国建设，轻松社交，轻度PVP，放置元素</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.休闲SLG定位：降低肝度，吸引泛用户；2.放置元素设计：离线收益、自动战斗减轻负担；3.社交压力小：联盟战非强制，休闲玩家友好；4.用户获取成本低：休闲玩法吸引女性、轻度玩家</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.SLG深度浅：核心玩家觉得不够硬核；2.付费设计待优化：ARPU值低于传统SLG；3.内容更新慢：新活动、新功能推出频率低；4.用户留存待提升：轻度玩家流失率高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-bd000b4a5c" data-category="奇幻/魔幻" data-release-date="2021-11-30">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Vikingard</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Hero Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2021-11-30</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">北欧写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-bd000b4a5c')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/vikingard/id1590852447" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/vikingard/id1590852447<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">北欧题材SLG，部落建设，维京英雄养成，联盟海战，跨服竞技</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化：北欧神话题材新颖，视觉识别度高；2.海战系统设计：舰船建造、海战玩法独特；3.英雄养成完整：维京英雄技能、装备、升星体系；4.美术风格独特：北欧符文、维京文化元素融入</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材小众：北欧神话受众有限；2.用户规模有限：买量成本高于传统题材；3.玩法创新不足：核心循环与竞品相似；4.内容更新慢：新英雄、新活动推出频率低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-c2f3ea2940" data-category="历史/中世纪" data-release-date="2020-07-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Rise of Castles: Ice and Fire</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Long Tech Network Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2020-07-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">奇幻写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-c2f3ea2940')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.im30.ROE.gp" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.im30.ROE.gp<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">多文明SLG，冰火元素系统，英雄养成，联盟战争，跨服竞技</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.冰火元素系统：冰火阵营差异化，策略选择丰富；2.多文明设计：4个文明特色技能、兵种不同；3.英雄养成完整：技能、装备、羁绊体系完善；4.跨服竞技设计：跨服战、竞技场提供PVP内容</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法创新不足：核心循环与竞品相似；2.买量依赖重：用户获取成本高；3.平衡性问题：冰火阵营强度不平衡；4.后期内容匮乏：满级后玩法单一</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-f2a6f46f32" data-category="历史/中世纪" data-release-date="2019-03-28">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Conquerors: Golden Age</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">IGG SINGAPORE PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2019-03-28</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-f2a6f46f32')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/conquerors-golden-age/id1149631667" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/conquerors-golden-age/id1149631667<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">历史题材SLG，亚历山大征战，城市建设，军队训练，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.历史IP差异化：亚历山大东征历史背景，代入感强；2.城市建设系统：建筑升级、科技研发完整；3.军队训练设计：多兵种克制、阵型系统；4.长线运营成功：5年持续更新，用户生命周期长</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面老旧：美术品质落后于新产品；2.玩法创新不足：核心循环多年未变；3.新手体验差：新玩家追赶困难；4.社交压力大：联盟战强制参与</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-d4f10e70dd" data-category="历史/中世纪" data-release-date="2012-04-17">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Forge of Empires</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">InnoGames</span>
+        <span class="meta-pill">iOS/Android/PC/Browser</span>
+        <span class="meta-pill">2012-04-17</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-d4f10e70dd')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://forgeofempires.com/" target="_blank" rel="noopener noreferrer">https://forgeofempires.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">历史文明SLG，城市发展，时代演进，PVP竞技，联盟合作</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.时代演进系统独特：从石器时代到未来时代，成长线清晰；2.长线运营标杆：12年持续运营，用户生命周期管理成熟；3.欧美用户基础庞大：欧洲市场占有率高；4.付费设计温和：无强制消费，礼包定价合理</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面风格偏卡通：部分玩家不接受；2.玩法深度不足：核心系统相对简单；3.战斗系统弱：战斗玩法简化；4.内容更新慢：新时代推出频率低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-9851ed118c" data-category="历史/中世纪" data-release-date="2011-08-14">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Goodgame Empire</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Goodgame Studios</span>
+        <span class="meta-pill">iOS/Android/PC/Browser</span>
+        <span class="meta-pill">2011-08-14</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通中世纪风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-9851ed118c')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://empire.goodgamestudios.com/" target="_blank" rel="noopener noreferrer">https://empire.goodgamestudios.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">中世纪城堡SLG，城堡建设，军队训练，联盟战争，PVP对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.欧洲老牌SLG：13年持续运营，用户生命周期极长；2.城堡建设系统：建筑升级、装饰系统完整；3.联盟战争设计：联盟战、跨服战功能完善；4.付费设计成熟：VIP、月卡、礼包组合合理</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面风格老旧：卡通风格落后于新产品；2.玩法创新不足：核心循环多年未变；3.新用户获取困难：买量成本高于新产品；4.新手体验差：新玩家追赶困难</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-fd43fb8ba3" data-category="科幻" data-release-date="2021-08-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>无尽的拉格朗日</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">网易游戏</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2021-08-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-fd43fb8ba3')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://lglr.163.com/" target="_blank" rel="noopener noreferrer">https://lglr.163.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">星际题材SLG，舰队建设，星系探索，联盟资源争夺，跨服会战</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.舰队编成系统深度高：舰船类型、武器配置、战术指令组合丰富；2.星系探索机制：迷雾探索+资源点发现，PVE内容充实；3.美术品质标杆：舰船模型精细，战斗特效出色；4.世界观构建完整：背景故事、势力设定细致</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.游戏节奏过慢：舰船建造时间长，单局战斗耗时久；2.新手引导不完善：系统复杂但教学不足；3.付费强度高：核心舰船抽取成本高；4.社交压力大：单人玩家生存空间小</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-f509c2dff4" data-category="历史/中世纪" data-release-date="2016-02-26">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>王国纪元</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">IGG</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2016-02-26</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通魔幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-f509c2dff4')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://lordsmobile.igg.com/" target="_blank" rel="noopener noreferrer">https://lordsmobile.igg.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">全球同服SLG，王国建设，英雄养成，跨服战役，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.全球同服技术成熟：多语言玩家同服竞技，社交范围广；2.英雄养成系统：RPG元素融合，英雄技能、装备、升星体系完整；3.跨服战役设计：Lords League赛季制，竞技性强；4.长线运营能力：8年持续更新，活动节奏稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费深度过大：英雄、装备、资源全面付费；2.数值碾压严重：大R可单人灭盟；3.新手保护弱：新玩家易成老玩家目标；4.玩法创新不足：核心循环多年未变</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-bd0405f547" data-category="历史/中世纪" data-release-date="2014-07-01">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>列王的纷争</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">智明星通</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2014-07-01</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实欧美风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-bd0405f547')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://cok.elex.com/" target="_blank" rel="noopener noreferrer">https://cok.elex.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">全球同服SLG，城堡建设，军队训练，王国战争，跨服争霸</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.全球同服先驱：早期出海成功案例，技术架构成熟；2.王国战争系统：跨服战、王战节奏设计合理；3.资源产出循环：资源岛争夺、贸易系统设计完整；4.长线运营经验：10年持续运营，用户生命周期管理成熟</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面老旧：美术品质落后于新产品；2.付费体验差：VIP系统、充值活动过于激进；3.新手引导缺失：系统复杂但教学不足；4.玩法固化：核心循环多年未更新</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-7ef18ebcd7" data-category="历史/中世纪" data-release-date="2021-12-29">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>文明与征服</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">广州四三九九信息科技有限公司</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2021-12-29</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实欧美风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-7ef18ebcd7')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://wmyzf.4399.com/" target="_blank" rel="noopener noreferrer">https://wmyzf.4399.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">赛季制SLG，无地形限制，千人同屏战斗，联盟争夺城邦</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.无地形限制设计：行军自由度高，战术灵活性增强；2.千人同屏战斗：视觉冲击力强，战场氛围营造好；3.零氪福利设计：首抽保底、日常资源投放充足，平民体验较好；4.战斗节奏快：单局5-10分钟，碎片化时间友好</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.策略深度不足：无地形限制导致战术单一；2.后期内容匮乏：赛季中后期玩法重复；3.英雄平衡性问题：部分英雄强度超标；4.社交粘性弱：联盟凝聚力不如竞品</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-1d6ed3fdb5" data-category="末日生存" data-release-date="2018-06-12">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Doomsday: Last Survivors</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">IGG SINGAPORE PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2018-06-12</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实末日风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-1d6ed3fdb5')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.igg.android.doomsdaylastsurvivors" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.igg.android.doomsdaylastsurvivors<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">末日生存SLG，基地建设，英雄养成，联盟协作，PVP对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.末日题材成熟：丧尸、生存元素设计完整；2.英雄养成系统：RPG元素融合，成长线清晰；3.联盟协作设计：联盟科技、联盟战功能完善；4.长线运营经验：5年持续更新，活动节奏稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法同质化：核心循环与State of Survival相似；2.创新度不足：缺乏差异化设计；3.买量依赖重：用户获取成本高；4.后期内容匮乏：满级后玩法单一</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-fcb10cc2e5" data-category="奇幻/魔幻" data-release-date="2012-08-02">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Clash of Clans</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Supercell</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2012-08-02</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">卡通奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-fcb10cc2e5')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://supercell.com/en/games/clashofclans/" target="_blank" rel="noopener noreferrer">https://supercell.com/en/games/clashofclans/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">村庄建设 SLG，军队训练，部落战，资源争夺，PVP 对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.Supercell 品质保证：品质、运营能力顶尖；2.部落战系统设计：社交属性强，粘性高；3.长线运营标杆：12 年持续更新，收入稳定；4.平衡性优秀：付费与免费玩家体验平衡</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法创新不足：核心循环多年未变；2.升级时间长：后期建筑升级耗时久；3.新手追赶难：老玩家优势明显；4.题材老旧：奇幻题材吸引力下降</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-c4c15060be" data-category="现代战争" data-release-date="2014-03-26">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Boom Beach</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Supercell</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2014-03-26</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">卡通现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-c4c15060be')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://supercell.com/en/games/boombeach/" target="_blank" rel="noopener noreferrer">https://supercell.com/en/games/boombeach/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代战争 SLG，基地建设，军队训练，PVP 掠夺，特遣队战</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.Supercell 品质保证：品质、运营能力顶尖；2.现代战争题材：差异化明显，视觉风格独特；3.特遣队系统设计：社交属性强，粘性高；4.长线运营成功：10 年持续更新，收入稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法创新不足：核心循环与 COK 相似；2.付费深度大：建筑升级、军队训练成本高；3.新手体验差：新玩家追赶困难；4.内容更新慢：新活动、新部队推出频率低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-6a7bf57b61" data-category="历史/中世纪" data-release-date="2024-10-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Age of Empires Mobile</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Level Infinite</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-10-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-6a7bf57b61')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.ageofempiresmobile.com/" target="_blank" rel="noopener noreferrer">https://www.ageofempiresmobile.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">多文明 SLG，文明选择，城市建设，军队训练，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.帝国时代 IP 改编：经典 PC 游戏 IP，粉丝基础庞大；2.多文明差异化设计：8 个文明特色技能、兵种、建筑不同；3.城市建设系统：建筑升级、科技研发完整；4.Level Infinite 发行：腾讯海外发行，资源投入大</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法创新不足：核心循环与竞品相似；2.付费深度大：资源、军队训练成本高；3.新手体验差：新玩家追赶困难；4.社交压力大：联盟战强制参与</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-03ece9540b" data-category="历史/中世纪" data-release-date="2020-11-16">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Civilization VI</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">2K Games</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2020-11-16</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-03ece9540b')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://civilization.2k.com/civ-vi/" target="_blank" rel="noopener noreferrer">https://civilization.2k.com/civ-vi/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">历史文明 SLG，文明选择，科技研发，城市建设，外交系统</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.文明 6 IP 改编：经典 PC 游戏 IP，粉丝基础庞大；2.文明差异化设计：19 个文明特色技能、建筑不同；3.科技研发系统：科技树、文化树完整；4.策略深度高：外交、战争、文化胜利多路径</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.上手门槛高：系统复杂，新手学习曲线陡峭；2.单局时间长：完整游戏 10-20 小时；3.付费深度大：DLC、内购成本高；4.操作复杂：移动端操作体验不佳</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-ddf2ca016a" data-category="历史/中世纪" data-release-date="2016-02-03">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>The Battle of Polytopia</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Midjiwan AB</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2016-02-03</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通低多边形风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-ddf2ca016a')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://polytopia.io/" target="_blank" rel="noopener noreferrer">https://polytopia.io/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">多文明 SLG，文明选择，城市建设，科技研发，PVP 对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.多文明差异化设计：18 个文明特色技能、建筑不同；2.单局时间短：30 分钟一局，碎片化友好；3.科技研发系统：科技树完整，策略选择丰富；4.付费设计优秀：买断制 +DLC，良心运营</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法深度不足：核心系统相对简单；2.画面风格特殊：低多边形风格劝退部分玩家；3.社交系统弱：PVP 互动功能少；4.内容更新慢：新文明、新内容推出频率低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-bc203b63ae" data-category="历史/中世纪" data-release-date="2013-07-01">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Game of War: Fire Age</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Machine Zone</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2013-07-01</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-bc203b63ae')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.gameofwarapp.com/" target="_blank" rel="noopener noreferrer">https://www.gameofwarapp.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">中世纪 SLG，城市建设，军队训练，联盟战争，PVP 对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.早期出海标杆：2013 年爆款，收入超 30 亿美元；2.联盟系统设计：联盟科技、联盟战功能完善；3.英雄养成系统：RPG 元素融合，成长线清晰；4.长线运营成功：10 年持续更新，收入稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面老旧：美术品质落后于新产品；2.付费深度大：建筑升级、军队训练成本高；3.新手体验差：新玩家追赶困难；4.玩法创新不足：核心循环多年未变</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-d4d2b0415f" data-category="现代战争" data-release-date="2015-11-05">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Mobile Strike</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Machine Zone</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2015-11-05</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-d4d2b0415f')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.mobilestrikeapp.com/" target="_blank" rel="noopener noreferrer">https://www.mobilestrikeapp.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代战争 SLG，基地建设，军队训练，联盟战争，PVP 对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.现代战争题材差异化：军事装备、现代战争元素设计独特；2.联盟系统设计：联盟科技、联盟战功能完善；3.军队训练系统：多兵种克制、阵型系统；4.长线运营成功：8 年持续更新，收入稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面老旧：美术品质落后于新产品；2.付费深度大：建筑升级、军队训练成本高；3.新手体验差：新玩家追赶困难；4.玩法创新不足：核心循环多年未变</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-31871e1380" data-category="历史/中世纪" data-release-date="2017-03-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Guns of Glory</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Century Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2017-03-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实中世纪风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-31871e1380')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.diandian.gog" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.diandian.gog<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">中世纪火器 SLG，城堡建设，军队训练，联盟战争，PVP 对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.中世纪火器题材差异化：火枪、大炮元素设计独特；2.联盟系统设计：联盟科技、联盟战功能完善；3.军队训练系统：多兵种克制、阵型系统；4.长线运营成功：6 年持续更新，收入稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.画面老旧：美术品质落后于新产品；2.付费深度大：建筑升级、军队训练成本高；3.新手体验差：新玩家追赶困难；4.玩法创新不足：核心循环多年未变</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-4d8b9a164c" data-category="末日生存" data-release-date="2020-01-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>The Ants: Underground Kingdom</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">StarUnion</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2020-01-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实昆虫风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-4d8b9a164c')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.allstarunion.ta.soe" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.allstarunion.ta.soe<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">蚂蚁题材 SLG，蚁穴建设，工蚁管理，联盟战争，PVP 对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.昆虫题材差异化：蚂蚁、昆虫元素设计独特，视觉识别度高；2.蚁穴建设系统：地下洞穴、通道设计独特；3.工蚁管理系统：分工、效率、进化系统；4.2020 年出海爆款：首年收入超 1 亿美元</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材小众：昆虫题材受众有限；2.付费深度大：建筑升级、工蚁进化成本高；3.新手体验差：新玩家追赶困难；4.社交压力大：联盟战强制参与</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-e38de8bd4c" data-category="奇幻/魔幻" data-release-date="2023-03-25">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Call of Dragons</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Farlight Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2023-03-25</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">3D 卡通奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-e38de8bd4c')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://callofdragons.farlightgames.com/" target="_blank" rel="noopener noreferrer">https://callofdragons.farlightgames.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">奇幻 SLG，战争宠物系统，3D 地形，飞行军团，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.战争宠物系统创新：龙、狮鹫等宠物参与战斗，增加策略维度；2.3D 地形设计优秀：真实山川河流影响行军和战斗；3.飞行军团系统：空中单位增加战术多样性；4.美术品质高：3D 建模精细，技能特效华丽</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费深度大：英雄、宠物抽取成本高；2.新手追赶难：老玩家优势明显；3.内容更新慢：新英雄、新活动推出频率低；4.社交系统弱：联盟互动功能较少</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-d292a88d96" data-category="科幻" data-release-date="2018-11-29">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Star Trek Fleet Command</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Scopely, Inc.</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2018-11-29</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实现代科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-d292a88d96')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.scopely.com/game/star-trek-fleet-command/" target="_blank" rel="noopener noreferrer">https://www.scopely.com/game/star-trek-fleet-command/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">科幻 SLG，舰队收集，星区探索，联盟战争，资源管理</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.IP 授权优秀：星际迷航正版授权，舰船、角色还原度高；2.舰队收集系统：企业号、克林贡战舰等经典舰船可收集；3.星区探索设计：开放星图，资源点、任务点分布合理；4.联盟战争系统：星域争夺、舰队战设计成熟</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费数值差距大：传奇舰船抽取成本高；2.玩法深度不足：核心系统相对简单；3.内容更新慢：新舰船、新剧情推出频率低；4.PVP 不平衡：大 R 玩家垄断星域</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-bd07451dd5" data-category="历史/中世纪" data-release-date="2020-03-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Puzzles &amp; Conquest</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">37GAMES</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2020-03-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-bd07451dd5')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.37games.com/" target="_blank" rel="noopener noreferrer">https://www.37games.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">三消 +SLG 融合玩法，英雄收集，城堡建设，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.玩法融合创新：三消 +SLG，降低门槛扩大用户群；2.英雄收集系统：英雄技能与三消玩法联动；3.付费设计优秀：月卡、礼包组合合理；4.长线运营成功：持续更新英雄、活动</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.SLG 元素较弱：核心玩法偏向三消；2.策略深度不足：战斗依赖三消运气；3.内容更新慢：新英雄推出频率低；4.社交系统弱：联盟互动功能较少</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-791d39b835" data-category="奇幻/魔幻" data-release-date="2021-04-15">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Age of Apes</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Holdfast</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2021-04-15</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">卡通猴子风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-791d39b835')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.holdfast.com/" target="_blank" rel="noopener noreferrer">https://www.holdfast.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">猴子题材 SLG，基地建设，英雄收集，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化：猴子题材 SLG，视觉风格独特；2.英雄收集系统：猴子英雄技能多样；3.基地建设设计：资源生产、科技研发成熟；4.美术风格独特：卡通猴子画风，吸引年轻用户</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.SLG 元素较弱：核心玩法相对简单；2.策略深度不足：战斗依赖英雄等级；3.内容更新慢：新英雄、新活动推出频率低；4.用户规模小：题材小众，用户基数有限</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-c41ac7cb1e" data-category="末日生存" data-release-date="2019-09-12 (PC), 2021-08-24 (Android)">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Northgard</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Shiro Games</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2019-09-12 (PC), 2021-08-24 (Android)</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">卡通北欧风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-c41ac7cb1e')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://northgard.com/" target="_blank" rel="noopener noreferrer">https://northgard.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">4X 策略，领土扩张，资源管理，派系对战，生存元素</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.PC 热门 4X 移植：完整保留核心玩法；2.维京题材差异化：北欧神话背景，派系特色鲜明；3.生存系统设计：冬季、食物、 happiness 系统增加策略深度；4.派系多样性：10+ 独特派系，玩法各异</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.上手门槛高：系统复杂，新手学习曲线陡峭；2.付费高：买断制 +DLC，成本高；3.节奏慢：单局时间长，不适合碎片化；4.移动端优化一般：小屏幕操作不便</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-9031c015ee" data-category="现代战争" data-release-date="2018-12-06">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Rebel Inc.</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Ndemic Creations</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2018-12-06</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-9031c015ee')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://rebelinc.com/" target="_blank" rel="noopener noreferrer">https://rebelinc.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">区域治理，军队部署，民心稳定，反腐系统，PVE 平叛</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.现代战争题材差异化：平叛、治理元素设计独特；2.区域治理系统：民生、基建、反腐多维度治理；3.军队部署设计：部队类型、部署策略丰富；4.策略深度高：民心、叛乱、外交复杂</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.SLG 元素较弱：核心玩法偏向模拟经营；2.上手门槛高：系统复杂，新手学习曲线陡峭；3.付费深度大：买断制 +DLC，成本高；4.社交系统弱：单人 PVE 体验为主</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-5be97f4f24" data-category="科幻" data-release-date="2025-10-21">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Foundation: Galactic Frontier</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">FunPlus</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-10-21</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-5be97f4f24')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.foundation.game/" target="_blank" rel="noopener noreferrer">https://www.foundation.game/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">太空 4X 策略，基地建设，舰队战斗，资源管理，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2025 年 10 月新游：基于阿西莫夫《基地》系列 IP，苹果 TV 授权；2.太空 4X 策略：探索、扩张、开发、征服完整循环；3.基地建设深度：多星球基地，科技树丰富；4.联盟战争：大规模太空舰队对战</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.新游待验证：长期运营情况待观察；2.付费深度待观察：FunPlus 游戏通常付费较深；3.IP 改编风险：原著粉丝期望高；4.竞品激烈：太空 SLG 市场竞争激烈</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-41d3941f78" data-category="历史/中世纪" data-release-date="2016-08-23 (iOS), 2018-12-19 (Android)">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Rome: Total War</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Feral Interactive (原 SEGA)</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2016-08-23 (iOS), 2018-12-19 (Android)</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-41d3941f78')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.feralinteractive.com/en/games/rometw/" target="_blank" rel="noopener noreferrer">https://www.feralinteractive.com/en/games/rometw/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">回合制大战略，省份管理，外交系统，家族树系统，回合制战役</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.PC 经典移植：完整保留 PC 版核心玩法，移动端优化出色；2.回合制大战略：大地图回合制，策略深度高；3.历史沉浸感强：真实历史事件、派系、将领；4.家族树系统：角色特质、继承机制增加代入感</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.上手门槛高：系统复杂，新手学习曲线陡峭；2.付费较高：买断制 +DLC，成本高；3.操作适配一般：移动端触屏操作不够便捷；4.内容更新少：主要靠 DLC 扩展</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-30c0ce1398" data-category="历史/中世纪" data-release-date="2025 (持续更新)">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>King of Avalon</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Century Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025 (持续更新)</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">欧美魔幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-30c0ce1398')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.kingofavalon.com/" target="_blank" rel="noopener noreferrer">https://www.kingofavalon.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">4X 策略，城堡建设，巨龙养成，联盟战争，资源争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.巨龙系统：巨龙收集养成，战斗辅助；2.中世纪题材：城堡建设，骑士培养；3.联盟战争：大规模 PVP，领土争夺；4.画面出色：欧美魔幻风格，细节丰富</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费深度：VIP 系统，氪金玩家优势大；2.玩法单一：核心循环重复；3.新手劣势：老区新手难发展；4.活动频繁：肝度较高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-985c6c7044" data-category="历史/中世纪" data-release-date="2025">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Beyond Astra</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">未知</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2025</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">科幻写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-985c6c7044')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://store.steampowered.com/" target="_blank" rel="noopener noreferrer">https://store.steampowered.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">太空 4X 策略，文明建设，舰队战斗，资源管理，星际探索</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.太空 4X：探索、扩张、开发、征服；2.跨平台：PC、移动端进度互通；3.2025 年新游：新游，画面出色；4.文明系统：多文明选择，各有特色</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.新游待验证：长期运营情况待观察；2.开发商未知：信息待确认；3.付费深度待观察：内购项目待确认；4.内容待扩充：刚发布，内容有限</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-0b239ac85a" data-category="历史/中世纪" data-release-date="2025">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Civilization VII</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Firaxis Games</span>
+        <span class="meta-pill">iOS/Android/PC/Switch</span>
+        <span class="meta-pill">2025</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-0b239ac85a')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://civilization.com/" target="_blank" rel="noopener noreferrer">https://civilization.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">4X 策略，文明演进，时代转换，外交系统，科技树研发</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.Civilization IP：经典 4X IP 正统续作；2.时代系统：时代转换，文明演进；3.跨平台：PC、主机、移动端；4.2025 年发布：新游，系统革新</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.移动端待确认：手游版本待确认；2.付费模式待观察：买断制或内购；3.配置要求：对设备性能要求高；4.学习曲线：新手上手难度高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-ab85c9a7be" data-category="历史/中世纪" data-release-date="2016-04-05">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>War and Order</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">CamelStudio</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2016-04-05</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-ab85c9a7be')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.camelgames.superking" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.camelgames.superking<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">中世纪奇幻 SLG，城堡建设，巨龙养成，联盟战争，资源争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.巨龙系统辨识度高：将城建与巨龙养成结合；2.联盟对抗成熟：领地战、集结战与跨服玩法完整；3.长线运营稳定：老牌出海 SLG，版本节奏成熟；4.美术完成度高：欧美奇幻包装清晰</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费深度较高：养成与加速消费点密集；2.老服追赶压力大：数值差距明显；3.核心循环偏传统：中后期新鲜感有限；4.社交依赖强：活跃联盟体验差异大</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-a41ef28dd4" data-category="现代战争" data-release-date="2017-05-16">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Mafia City: War of Underworld</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">VoyagerOne Pte. Ltd.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2017-05-16</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-a41ef28dd4')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/mafia-city-like-a-dragon/id1235569398" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/mafia-city-like-a-dragon/id1235569398<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">黑帮题材 SLG，地盘经营，成员养成，联盟对抗，城市资源争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材差异化明显：黑帮经营在 SLG 中辨识度很高；2.城市争夺氛围强：地盘战与帮会协作成型；3.商业化验证充分：长期位于出海 SLG 主流产品带；4.包装成熟：写实都会风格统一</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.数值压力偏大：后期强度依赖养成投入；2.题材门槛较窄：并非所有玩家都接受黑帮叙事；3.新手追赶困难：老服生态压制明显；4.玩法循环传统：中后期以养成与活动驱动为主</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-f699d4ef9f" data-category="末日生存" data-release-date="2021-04-12">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>The Walking Dead: Survivors</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Galaxy Play Technology Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2021-04-12</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">美漫写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-f699d4ef9f')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.elex.twdsaw.vn" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.elex.twdsaw.vn<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">末日生存 SLG，营地建设，角色养成，联盟协作，领地防守</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.IP 认知度强：《行尸走肉》授权带来较强题材吸引力；2.避难所经营清晰：防御与资源循环易理解；3.联盟协作比重高：集结与领地玩法成型；4.末日包装完整：角色、敌人和场景统一度高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.付费差距明显：强联盟和高养成账号优势大；2.玩法创新有限：底层循环仍是成熟末日 SLG 模板；3.后期重复度高：活动结构偏常规；4.IP 加成有限：非粉丝对剧情黏性一般</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-e2772e8549" data-category="末日生存" data-release-date="2022-05-06">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Ant Legion: For The Swarm</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">37GAMES</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2022-05-06</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实昆虫风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-e2772e8549')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.global.antgame" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.global.antgame<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">蚂蚁题材 SLG，蚁巢建设，蚁群养成，联盟对抗，资源扩张</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.题材识别度高：昆虫生态包装与常规人类战争 SLG 区隔明显；2.蚁巢经营有差异：巢穴结构与蚁群分工形成记忆点；3.视觉细节突出：昆虫建模与生态场景完成度较高；4.市场验证不错：蚂蚁品类已形成稳定受众</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材相对小众：对部分玩家有审美门槛；2.数值成长压力大：中后期养成成本较高；3.玩法深度有限：核心循环仍偏传统；4.社交依赖度高：单人体验上限有限</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-8320df13b3" data-category="奇幻/魔幻" data-release-date="2024-01-02">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Sea of Conquest: Pirate War</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">FunPlus International AG</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-01-02</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">风格化写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-8320df13b3')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.seaofconquest.global" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.seaofconquest.global<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">航海 SLG，舰船经营，港口建设，海域探索，联盟海战</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.海盗题材稀缺：在移动 SLG 中有明显差异化；2.海域探索感较强：航线、港口与海战构成完整循环；3.题材包装鲜明：角色与船只设计统一；4.联盟海战有卖点：多人海域争夺更贴合题材</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.商业化压力不低：养成与活动驱动较重；2.新服生态影响大：联盟强弱决定体验；3.中后期重复度上升：日常循环趋于固定；4.内容平衡仍需观察：海战与养成节奏调整频繁</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-21f9302d7e" data-category="科幻" data-release-date="2023-09-19">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Project Entropy</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">FunPlus International AG</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2023-09-19</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实现代科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-21f9302d7e')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.entropy.global" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.entropy.global<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">科幻 4X/SLG，基地经营，机甲与部队养成，资源采集，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.科幻包装完整：机甲、未来战场和基地系统统一；2.4X 骨架明确：扩张、采集、联盟冲突结构清晰；3.全球发行资源足：FunPlus 擅长做长线运营；4.视听品质在线：整体完成度高于普通中小体量新品</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.创新幅度有限：底层仍是成熟 4X 手游模板；2.养成线较多：前中期学习与投入压力偏高；3.版本仍在爬坡：长期留存还需观察；4.同类竞争激烈：科幻赛道强对手不少</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-edc4b6ce92" data-category="现代战争" data-release-date="2019-09-27">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Kiss of War: Dead Blood</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Tap4fun (Hong Kong) Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2019-09-27</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-edc4b6ce92')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.tap4fun.kissofwar.googleplay" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.tap4fun.kissofwar.googleplay<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代军事 SLG，基地建设，军官养成，联盟战争，地图资源争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.现代军事包装成熟：题材辨识度稳定；2.女性指挥官视觉标签明显：在同类中有较强记忆点；3.联盟战体系完整：集结、据点和跨服对抗成熟；4.Tap4fun 运营经验足：活动和版本节奏相对稳定</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.数值差距明显：高付费账号优势较大；2.美术导向争议：角色包装会筛掉一部分用户；3.核心循环偏传统：缺少结构性创新；4.长线体验依赖联盟活跃度</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-a356a21f37" data-category="历史/中世纪" data-release-date="2016-08-05">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Brutal Age: Horde Invasion</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Tap4fun (Hong Kong) Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2016-08-05</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">卡通原始风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-a356a21f37')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.tap4fun.brutalage_test" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.tap4fun.brutalage_test<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">部落 SLG，营地建设，兵种训练，地图扩张，联盟冲突</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.原始部落题材少见：与传统中世纪和末日 SLG 区隔明显；2.美术风格鲜明：卡通化包装容易形成记忆点；3.规则直观：上手门槛相对较低；4.老牌产品稳定：有较完整的运营与活动结构</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.玩法深度有限：中后期循环比较单一；2.付费与养成压力存在：后期强度差距明显；3.内容老化：产品年龄较大；4.视觉风格偏轻：不一定符合硬核用户口味</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-0a2cbfb827" data-category="现代战争" data-release-date="2014-12-07">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Invasion: Aerial Warfare</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Tap4fun (Hong Kong) Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2014-12-07</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-0a2cbfb827')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://play.google.com/store/apps/details?id=com.tap4fun.reignofwar" target="_blank" rel="noopener noreferrer">https://play.google.com/store/apps/details?id=com.tap4fun.reignofwar<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代军事 SLG，基地经营，空军养成，联盟战争，世界地图争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.空战标签清晰：以空军和现代装备作为差异点；2.老牌出海产品：典型早期全球化军事 SLG；3.联盟战争结构成熟：地图争夺与多人协作完整；4.题材受众稳定：现代军事长期有固定用户群</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.产品年代较久：界面和美术已经显老；2.养成压力偏大：数值成长较重；3.玩法结构传统：缺乏近年新品的系统创新；4.新用户门槛较高：老服生态和追赶压力明显</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-f043fc26a7" data-category="奇幻/魔幻" data-release-date="2025-02-27">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>荒野国度</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">圆桌工作室</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-02-27</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">卡通奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-f043fc26a7')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.taptap.cn/moment/630432818962368440" target="_blank" rel="noopener noreferrer">https://www.taptap.cn/moment/630432818962368440<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">赛季制奇幻 SLG，城池经营，英雄编队，地块争夺，联盟会战</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.动物拟人题材在近年新游里辨识度较高；2.赛季制结构清晰，适合观察中轻度用户转化；3.首发阶段投放与榜单表现不错；4.阵容与技能搭配更偏英雄战争 SLG 路线</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材是否能持续破圈还要继续看；2.核心循环仍是成熟赛季 SLG 模板；3.中后期商业化深度待观察；4.长线内容消耗速度还有验证空间</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-243c473263" data-category="奇幻/魔幻" data-release-date="2025-03-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Avatar Legends: Realms Collide</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Tilting Point LLC</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-03-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">美式动画风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-243c473263')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.tiltingpoint.com/games/avatar-legends-realms-collide/" target="_blank" rel="noopener noreferrer">https://www.tiltingpoint.com/games/avatar-legends-realms-collide/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">4X/SLG，主城建设，英雄养成，联盟战争，地图扩张</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.阿凡达 IP 具备全球认知度；2.美术包装和世界观门槛较低；3.产品明显面向全球市场；4.IP 型 SLG 对泛用户渗透价值较高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.IP 改编产品常见的玩法同质化风险仍在；2.硬核策略深度未必能匹配重度 SLG 用户；3.长线留存要看联盟生态；4.授权产品投放成本通常不低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-97d01558d8" data-category="三国" data-release-date="2025-04-17">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>群星纪元</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">景秀游戏</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-04-17</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">写实科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-97d01558d8')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/cn/app/%E7%BE%A4%E6%98%9F%E7%BA%AA%E5%85%83/id6737089883" target="_blank" rel="noopener noreferrer">https://apps.apple.com/cn/app/%E7%BE%A4%E6%98%9F%E7%BA%AA%E5%85%83/id6737089883<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">科幻 SLG，多星球扩张，机甲编队，联盟沙盘战，赛季对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.国产科幻 SLG 里题材表达比较鲜明；2.机甲与星际战场能拉开和传统三国末日产品的距离；3.上线初期市场声量高；4.适合观察科幻题材在国内 SLG 的天花板</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.科幻题材买量成本通常更高；2.大地图赛季玩法仍需持续内容支撑；3.重度联盟依赖会抬高流失风险；4.创新点能否沉淀成长期留存仍需看后续赛季</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-7608e868c9" data-category="历史/中世纪" data-release-date="2025-05-03">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Game of Thrones: Dragonfire</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Warner Bros. Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-05-03</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-7608e868c9')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://hbogamessupport.wbgames.com/hc/en-us/articles/46517889949971-Frequently-Asked-Questions" target="_blank" rel="noopener noreferrer">https://hbogamessupport.wbgames.com/hc/en-us/articles/46517889949971-Frequently-Asked-Questions<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">4X/SLG，城堡建设，家族养成，巨龙战斗，联盟争霸</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.权游 IP 对西方市场依然有很强号召力；2.龙与家族权谋天然适配 4X 框架；3.海外市场讨论度高，适合做全球向竞品观察；4.软启动阶段就能看到用户反馈方向</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.目前仍是分地区投放，全球成绩还没完全定型；2.IP 授权成本和预期都高；3.容易落入传统 4X 数值坑；4.软启动数据不一定代表正式版本表现</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-b1aae191db" data-category="奇幻/魔幻" data-release-date="2025-06-26">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>龙石战争</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">腾讯凯博 / 儒意景秀</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-06-26</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">3D奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-b1aae191db')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.dragonstonewar.com/" target="_blank" rel="noopener noreferrer">https://www.dragonstonewar.com/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">奇幻 SLG，城建经营，英雄养成，巨龙助战，联盟攻城</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.龙与塔防攻防结合，包装辨识度不错；2.腾讯系研发加大发行组合值得持续跟踪；3.产品尝试把沙盘城建和攻防体验做混合；4.上线节点明确，便于跟踪榜单表现</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.融合玩法是否真正提升留存还要看中后期；2.奇幻赛道头部竞争激烈；3.如果过度依赖数值成长，差异化会被稀释；4.联盟体验很可能决定长期口碑</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-ccadbd22bd" data-category="末日生存" data-release-date="2025-08-05">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Fate War</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">IGG SINGAPORE PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android/PC</span>
+        <span class="meta-pill">2025-08-05</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实奇幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-ccadbd22bd')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://store.steampowered.com/app/3581600/Fate_War/" target="_blank" rel="noopener noreferrer">https://store.steampowered.com/app/3581600/Fate_War/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">部落生存 SLG，聚落建设，季节经营，英雄与副官作战，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.IGG 2025 年重点新作，市场观察价值高；2.把生存部落经营和 SLG 合并在一起；3.支持横竖屏切换，产品形态上有新尝试；4.上线初期已有一定收入反馈</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.IGG 老问题仍可能体现在数值和付费深度上；2.题材包装不如传统大 IP 直接；3.生存与 SLG 混合可能带来学习成本；4.长期内容消耗速度需要继续验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-4c042f681c" data-category="三国" data-release-date="2025-10-11">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>三国群英传：策定九州</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">星辉游戏</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-10-11</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">写实三国风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-4c042f681c')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://news.17173.com/content/09222025/141502322.shtml" target="_blank" rel="noopener noreferrer">https://news.17173.com/content/09222025/141502322.shtml<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">三国即时策略 SLG，沙盘行军，武将编队，兵种协同，联盟攻城</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.三国群英传 IP 在华语市场仍有认知；2.更强调 RTS 操作感，和传统站桩式 SLG 有区隔；3.2025 年上线节点明确，便于追踪买量和榜单；4.适合观察 RTS 化会不会重新带动三国 SLG 赛道</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.即时操作强化后新手门槛可能提高；2.是否能兼顾长线养成与即时战场还需验证；3.三国赛道竞争极强；4.IP 用户对品质预期偏高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-f4ae9a9d5d" data-category="三国" data-release-date="2025-12-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>九牧之野</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">仙峰游戏 / 雷霆游戏</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-12-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">写实三国风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-f4ae9a9d5d')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://stockmc.xueqiu.com/202508/603444_20250820_TMO5.pdf" target="_blank" rel="noopener noreferrer">https://stockmc.xueqiu.com/202508/603444_20250820_TMO5.pdf<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">三国赛季制 SLG，自由行军，多队即时战斗，联盟攻城，资源运营</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.强调即时战斗和多队操作，在传统率土系之外做差异；2.公测前预约表现不错；3.雷霆代理的产品适合观察中重度策略用户接受度；4.上线节点接近年末，利于观察寒假档表现</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.三国赛道用户被头部产品锁定严重；2.多队即时操作会抬高学习成本；3.赛季制内容供给压力大；4.长线付费结构还需要后续验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-e0880ec4e3" data-category="三国" data-release-date="2026-01-25">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Three Kingdoms: World Conquest</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Rastar Mobile</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2026-01-25</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">3D写实三国风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-e0880ec4e3')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/three-kingdoms-world-conquest/id6737824062" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/three-kingdoms-world-conquest/id6737824062<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">三国 RTS/SLG，自由行军，实时调兵，村庄经营，联盟攻防</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.海外向三国题材新品，方便对比国内同类思路；2.把 RTS 手感和 SLG 养成放在一起；3.官方强调亚洲市场已有下载积累；4.适合跟踪三国题材全球化潜力</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.海外本地化和文化理解可能影响转化；2.RTS 化会提高操作负担；3.品类混合容易两边都不够极致；4.全球市场后续留存还未完全验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-3dd196863a" data-category="三国" data-release-date="2026-04-16">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>三国：天下归心</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">恺英网络 / 乘风工作室</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2026-04-16</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">三国</span><span class="badge">写实三国风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-3dd196863a')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.taptap.cn/app/759941" target="_blank" rel="noopener noreferrer">https://www.taptap.cn/app/759941<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">国战 SLG，交易行经济，九宫格布阵，多剧本赛季，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.主打不种田不内卷，切入点和传统三国 SLG 有区别；2.加入交易行和战前布阵，观察价值高；3.预约量已做起来，市场关注度不低；4.对国战 like 的改造值得持续跟踪</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.最终表现还要看正式公测留存；2.三国赛道卷度极高；3.创新机制能否形成长期优势还未知；4.经济系统和平衡性会是高风险点</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-3a54f321ca" data-category="末日生存" data-release-date="2025-03-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Frozen War</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">IGG SINGAPORE PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-03-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实冰原风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-3a54f321ca')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/frozen-war/id6738370929" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/frozen-war/id6738370929<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">冰雪生存 SLG，基地经营，部队养成，联盟会战，资源采集</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.IGG 在 2025 年推出的新末日生存方向产品；2.冰雪灾变题材仍有买量吸引力；3.从视觉到循环都更贴近近年海外主流生存 SLG；4.适合观察 IGG 在新品上的题材迭代</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.与同类冰雪生存产品竞争会非常直接；2.长线差异化目前还不够明确；3.联盟依赖和数值成长压力大概率仍会很高；4.新品的中后期内容储备还需验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-badc6f958c" data-category="奇幻/魔幻" data-release-date="2025-07-24">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Disney Realm Breakers</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">JOYCITY Corp.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-07-24</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">奇幻/魔幻</span><span class="badge">美式卡通风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-badc6f958c')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://miraeassetsecurities.com/bbs/download/2126567.pdf?attachmentId=2126567" target="_blank" rel="noopener noreferrer">https://miraeassetsecurities.com/bbs/download/2126567.pdf?attachmentId=2126567<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">迪士尼 IP 4X/SLG，基地建设，英雄收集，联盟战争，地图扩张</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.迪士尼和皮克斯角色自带全球认知；2.IP 向 SLG 在买量素材上更容易做大盘测试；3.JOYCITY 擅长做联盟战争型产品；4.很适合观察强 IP 是否能拉低 SLG 获客门槛</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.IP 包装和硬核 SLG 之间天然存在用户错位；2.若策略深度不足，留存可能承压；3.授权成本高，商业化压力会更大；4.当前更多还是区域阶段验证样本</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-354cb9dea0" data-category="历史/中世纪" data-release-date="2025-07-14">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Age of Empires: Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Tencent / TiMi Studio Group</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-07-14</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-354cb9dea0')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.pocketgamer.biz/tencent-gives-age-of-empires-the-last-war-treatment-on-mobile/" target="_blank" rel="noopener noreferrer">https://www.pocketgamer.biz/tencent-gives-age-of-empires-the-last-war-treatment-on-mobile/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">AoE IP 生存 SLG，主城建设，闯关外层，部队养成，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.Age of Empires 是全球最强历史策略 IP 之一；2.把 4X/SLG 与轻量外层闯关结合，明显是顺应新买量素材趋势；3.腾讯出海产品，市场动作值得跟踪；4.适合观察经典 PC 策略 IP 如何向移动新模板适配</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.对老 AoE 用户来说可能过于手游化；2.IP 改编和轻量化之间容易失衡；3.如果内核创新不足，长期还是会回到传统数值竞争；4.目前更多是早期市场验证阶段</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-186bfb2e69" data-category="历史/中世纪" data-release-date="2025-06-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Civilization: Eras &amp; Allies 2K</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">2K, Inc.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-06-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实历史风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-186bfb2e69')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/sg/app/civilization-eras-allies-2k/id1617124341" target="_blank" rel="noopener noreferrer">https://apps.apple.com/sg/app/civilization-eras-allies-2k/id1617124341<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">文明题材 4X/SLG，城邦经营，名人养成，联盟战役，时代推进</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.Civilization 品牌对全球策略用户有天然吸引力；2.移动端更强调联盟与赛季化运营；3.2025 年仍在区域推进，适合持续观察版本方向；4.同类里品牌辨识度极高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.与主机 PC 用户对 Civilization 的预期差距较大；2.若联盟战争比重过高，会削弱单局 4X 乐趣；3.老产品重新包装的观感会影响新鲜度；4.区域化发行节奏说明全球验证仍未完成</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-5abc1a7061" data-category="现代战争" data-release-date="2025-08-01">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Warline: Sniper Strike</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Farlight Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-08-01</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代军事风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-5abc1a7061')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.gamehaunt.com/news/warline-sniper-strike-is-available-on-mobile-soft-launch/" target="_blank" rel="noopener noreferrer">https://www.gamehaunt.com/news/warline-sniper-strike-is-available-on-mobile-soft-launch/<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">现代战争 SLG，基地建设，狙击题材外层，部队养成，联盟战斗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.明显融合了近年高点击率的狙击买量素材；2.现代军事题材在海外依旧有稳定受众；3.Farlight 的新品方向值得观察；4.适合看超休闲外层和传统 SLG 内核的组合效果</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.如果外层只是素材化包装，留存风险会很高；2.现代军事赛道本身已很拥挤；3.狙击标签可能吸引来错配用户；4.当前仍偏早期测试口径</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-6a20202625" data-category="历史/中世纪" data-release-date="2024-12-23">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Savage Survival: Jurassic Isle</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">VoyagerOne Pte. Ltd.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-12-23</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">历史/中世纪</span><span class="badge">写实远古风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-6a20202625')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/savage-survival-jurassic-isle/id6737189862" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/savage-survival-jurassic-isle/id6737189862<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">恐龙生存 SLG，营地建设，部队养成，资源采集，联盟对抗</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.恐龙和原始生存题材在海外素材层面辨识度强；2.与传统末日或中世纪 SLG 有明显视觉区隔；3.更适合观察题材差异化能否带来获客红利；4.新品阶段容易看到用户对题材的直观反馈</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材虽然吸睛，但长线内容未必够厚；2.如果系统仍是标准模板，后期会迅速同质化；3.产品知名度暂时不高；4.联盟和数值深度还需要市场验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-5a5bc9685e" data-category="科幻" data-release-date="2025-12-06">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Xeno Warpath</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Wanda Cinemas Games</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-12-06</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实现代科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-5a5bc9685e')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://www.taptap.io/app/728213" target="_blank" rel="noopener noreferrer">https://www.taptap.io/app/728213<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">科幻战争 SLG，基地经营，机甲与舰队养成，资源争夺，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.海外新品里少见强调外星战争和机甲火力的方向；2.科幻题材在欧美市场更容易跑出差异；3.适合与群星纪元等产品做中外对比；4.新品期更容易观察题材和美术拉力</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.当前仍偏测试与观察阶段；2.科幻赛道获客成本通常更高；3.若底层循环不够强，很容易只剩包装差异；4.长期内容需求会比传统题材更高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-65497967b7" data-category="科幻" data-release-date="2025-02-25">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Godzilla x Kong: Titan Chasers</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Tilting Point LLC</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-02-25</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实怪兽风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-65497967b7')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/godzilla-x-kong-titan-chasers/id1670938027" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/godzilla-x-kong-titan-chasers/id1670938027<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">怪兽题材 4X/SLG，基地建设，探索采集，泰坦养成，联盟争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.怪兽宇宙 IP 在欧美有稳定受众；2.怪兽和基地经营结合的题材相对少见；3.适合观察强视觉 IP 对策略品类的拉新效果；4.产品全球市场辨识度强</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.IP 用户和重度策略用户不一定完全重合；2.若怪兽养成比重过高，SLG 深度可能被削弱；3.题材驱动的前期吸量未必能转成长线留存；4.授权产品普遍面临高成本压力</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-cad2f965d4" data-category="末日生存" data-release-date="2025-11-18">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Resident Evil Survival Unit</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Aniplex Inc. / JOYCITY</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-11-18</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实末日风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-cad2f965d4')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/resident-evil-survival-unit/id6744668327" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/resident-evil-survival-unit/id6744668327<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">生存策略手游，基地经营，角色编队，实时决策，联盟协作</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.生化危机是全球知名度极高的末日 IP；2.官方明确强调这是移动端策略新作；3.丧尸和基地经营在 SLG 市场依旧有成熟用户池；4.对海外市场观察价值很高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.主机 IP 改编到手游策略常常存在预期差；2.若玩法偏轻，会很难承接核心粉丝；3.长线数值和商业化设计还没有被充分验证；4.目前仍属于较新的上线样本</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-927f899d78" data-category="末日生存" data-release-date="2025-07-03">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Tiles Survive!</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">FunPlus International AG</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-07-03</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">风格化卡通风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-927f899d78')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/tiles-survive/id6738109752" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/tiles-survive/id6738109752<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">生存建造策略手游，地块扩张，资源经营，外层轻量解谜，基地成长</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.FunPlus 在 2025 年探索的新混合形态产品；2.把 tile 解谜与生存建造结合，更贴近当前混合变现趋势；3.适合观察轻量外层对中度策略产品的导量能力；4.海外市场对这类 hybrid 方向接受度较高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.更偏 hybrid strategy，硬核 SLG 浓度有限；2.若外层吸引来的用户和内核不匹配，留存会承压；3.长期深度和联盟黏性还有待验证；4.产品风格更轻，未必吃到重度策略用户</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-e5489f6c90" data-category="末日生存" data-release-date="2025-10-21">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Dawn Watch: Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">STARFORTUNE INTERACTIVE ENTERTAINMENT TECHNOLOGY CO., LIMITED</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-10-21</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实末日风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-e5489f6c90')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/dawn-watch-survival/id6752848516" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/dawn-watch-survival/id6752848516<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">末日生存 SLG，基地建设，部队养成，联盟协作，资源争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2025 年新上线，适合观察末日赛道新产品表现；2.题材和买量逻辑成熟；3.便于与 Last War、Dark War 这类产品横向比较；4.商店信息明确，后续跟踪方便</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.题材同质化压力大；2.长期差异点尚不突出；3.中后期商业化结构还要继续验证；4.联盟依赖度预计较高</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-86daa992be" data-category="现代战争" data-release-date="2025-09-17">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Mafia Mobile</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">IGG SINGAPORE PTE. LTD.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-09-17</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-86daa992be')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/mafia-mobile/id6739123904" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/mafia-mobile/id6739123904<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">黑帮题材 SLG，地盘经营，成员养成，联盟对抗，城市资源争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.IGG 2025 年黑帮方向新作；2.题材在海外市场有固定受众；3.适合和 Mafia City、The Grand Mafia 对比；4.商店上线时间明确</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.黑帮题材受众相对窄；2.与现有成熟产品竞争激烈；3.数值成长和帮派生态风险较高；4.长线差异化还需观察</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-df6e8fc3ea" data-category="科幻" data-release-date="2024-09-26">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>EVE Galaxy Conquest</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">CCP ehf.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-09-26</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实现代科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-df6e8fc3ea')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/eve-galaxy-conquest/id6470340437" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/eve-galaxy-conquest/id6470340437<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">星际 4X/SLG，基地发展，舰队养成，资源采集，联盟战争</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.EVE 品牌在海外硬核策略用户中认知强；2.星际题材适合观察 4X 深度用户的接受度；3.与传统地面战争 SLG 区隔明显；4.商店信息完整，适合持续跟踪</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.科幻赛道获客成本高；2.硬核题材会抬高门槛；3.若过度手游化可能损伤 IP 预期；4.全球长线表现仍需继续观察</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-e63af2fa25" data-category="现代战争" data-release-date="2025-03-13">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>DC: Dark Legion</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">FunPlus International AG</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-03-13</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">美漫写实风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-e63af2fa25')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/dc-dark-legion/id6479020757" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/dc-dark-legion/id6479020757<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">超级英雄 4X/SLG，基地经营，英雄养成，联盟对抗，地图扩张</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.DC IP 全球认知度高；2.FunPlus 擅长联盟战争框架；3.适合观察超级英雄 IP 与 SLG 的结合效果；4.2025 年上线，市场观察价值高</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.IP 用户和重度 SLG 用户可能错位；2.若英雄养成比重过高，策略深度会被削弱；3.授权产品成本高；4.长期留存还需要版本验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-81671d4762" data-category="末日生存" data-release-date="2025-01-09">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>High Seas Hero: Dig &amp; Build</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Century Games Pte. Ltd.</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-01-09</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">卡通航海风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-81671d4762')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/high-seas-hero-dig-build/id6621220868" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/high-seas-hero-dig-build/id6621220868<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">航海生存策略手游，船队经营，地块扩张，资源建设，外层轻操作</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2025 年新品，题材辨识度不错；2.航海和 build 方向适合观察 hybrid strategy 趋势；3.Century Games 新方向值得跟踪；4.商店条目清晰，后续复核成本低</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.更偏轻中度策略；2.硬核 SLG 深度可能不足；3.玩法是否能支撑长线仍待看；4.题材吸量和留存未必成正比</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-11a22c688b" data-category="末日生存" data-release-date="2024-09-11">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Dark War:Survival</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Florere Game Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-09-11</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">写实末日风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-11a22c688b')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/dark-war-survival/id6670441558" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/dark-war-survival/id6670441558<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">末日生存 SLG，基地建设，部队养成，联盟合作，资源采集</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2024 下半年新样本，适合跟踪生存 SLG 的新品竞争；2.与 Dawn Watch、Last War 同赛道，可做横向比较；3.末日题材在海外仍有稳定买量空间；4.商店数据容易追踪</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.赛道拥挤；2.若系统差异不足，容易同质化；3.长线内容消耗速度需观察；4.联盟与数值压力大概率不低</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-df9dd13a7d" data-category="现代战争" data-release-date="2025-01-03">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Grand Gangster War</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">WGAME TECHNOLOGY LIMITED</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-01-03</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">现代战争</span><span class="badge">写实现代风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-df9dd13a7d')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/grand-gangster-war/id6670165223" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/grand-gangster-war/id6670165223<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">黑帮题材策略手游，地盘扩张，帮派经营，角色养成，城市争夺</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2025 年初上架，适合观察黑帮题材新品密度；2.更适合做市场情报样本而不是头部竞品；3.与 Mafia Mobile 可直接对照；4.题材在欧美与东南亚都有一定接受度</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.品牌认知度较弱；2.与头部黑帮 SLG 相比优势不明显；3.长期运营能力待观察；4.容易陷入题材同质化竞争</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-7fbb28856e" data-category="经营模拟" data-release-date="2024-12-11">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Age Of Sails</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">Estoty LLC</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-12-11</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">经营模拟</span><span class="badge">风格化航海风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-7fbb28856e')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/age-of-sails/id6738692514" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/age-of-sails/id6738692514<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">航海策略手游，舰船经营，海域推进，资源建设，队伍成长</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2024 年末新样本，适合看航海题材在轻中度策略中的表现；2.海战题材相对有差异；3.产品形态更轻，利于观察 hybrid 化趋势；4.商店信息完整</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.更偏轻策略，SLG 浓度有限；2.长线联盟深度不一定够强；3.市场声量目前不高；4.后续运营强度还不明确</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-8a227d6488" data-category="科幻" data-release-date="2024-01-10">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Marsaction 2: Space Homestead</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">LEXIANGCO.,LIMITED</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2024-01-10</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">科幻</span><span class="badge">写实科幻风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-8a227d6488')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/marsaction-2-space-homestead/id6449419017" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/marsaction-2-space-homestead/id6449419017<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">太空生存策略手游，基地经营，资源采集，部队成长，外层探索</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.科幻生存方向在海外有明确受众；2.作为 Marsaction 系列续向样本，便于跟踪系列化策略产品；3.题材与末日地面战产品区隔明显；4.商店时间与发行方清晰</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.系列品牌影响力有限；2.科幻赛道买量成本偏高；3.若外层探索强于联盟玩法，SLG 深度可能不足；4.长期内容供给有压力</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article>
+
+<article class="game-card" data-game-id="game-81444e2707" data-category="末日生存" data-release-date="2025-04-09">
+  <div class="card-head">
+    <div class="card-title-wrap">
+      <div class="card-topline"><span class="played-flag">✓ 已玩</span></div>
+      <h2><span>Final War: Frozen Defense</span><span class="title-check">✓</span></h2>
+      <div class="card-subline">
+        <span class="meta-pill">HaoPlay Limited</span>
+        <span class="meta-pill">iOS/Android</span>
+        <span class="meta-pill">2025-04-09</span>
+      </div>
+    </div>
+    <div class="card-badges"><span class="badge badge-primary">末日生存</span><span class="badge">风格化冰原风</span></div>
+  </div>
+  <div class="card-actions"><button class="mini-action" type="button" onclick="addCardToPlaylist('game-81444e2707')">加入游玩清单</button></div>
+  <div class="field-grid">
+    <div class="field field-wide"><div class="field-label">官网</div><div class="field-value"><a class="link-pill" href="https://apps.apple.com/us/app/final-war-frozen-defense/id6741840895" target="_blank" rel="noopener noreferrer">https://apps.apple.com/us/app/final-war-frozen-defense/id6741840895<span>↗</span></a></div></div>
+    <div class="field field-wide"><div class="field-label">核心玩法</div><div class="field-value">冰雪生存策略手游，基地经营，外层塔防战斗，资源建设，队伍成长</div></div>
+    <div class="field field-highlight"><div class="field-label">亮点</div><div class="field-value">1.2025 年新品，适合观察冰雪生存题材继续外溢；2.把 defense 外层和生存经营做融合；3.可与 Whiteout/Frozen War 等方向对照；4.商店条目明确，便于后续跟踪</div></div>
+    <div class="field field-warning"><div class="field-label">不足</div><div class="field-value">1.更偏 hybrid strategy；2.硬核 SLG 浓度可能不高；3.题材赛道已经比较拥挤；4.是否能形成长期留存仍需验证</div></div>
+    <div class="field field-compact"><div class="field-label">截图</div><div class="field-value">暂无</div></div>
+  </div>
+</article></main></div>
+      <aside class="playlist-pane">
+        <div class="playlist-shell">
+          <div class="playlist-head">
+            <div class="playlist-kicker">PLAYLIST BOARD</div>
+            <h2 class="playlist-title">游玩清单</h2>
+            <p class="playlist-note">点左侧卡片的“加入游玩清单”即可收藏。勾选后，主库里的游戏名旁边也会出现已玩标记。</p>
+            <div class="playlist-stats">
+              <div class="playlist-stat"><span class="playlist-stat-label">清单总数</span><span class="playlist-stat-value" id="playlistCount">0</span></div>
+              <div class="playlist-stat"><span class="playlist-stat-label">已完成</span><span class="playlist-stat-value" id="playedCount">0</span></div>
+            </div>
+          </div>
+          <div class="playlist-actions">
+            <button class="button ghost" type="button" onclick="clearPlayed()">清空已玩标记</button>
+            <button class="button ghost" type="button" onclick="clearPlaylist()">清空清单</button>
+          </div>
+          <div id="playlistEmpty" class="playlist-empty">清单还是空的，可以先从主库挑几款进去。</div>
+          <ul id="playlistList" class="playlist-list"></ul>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer">页面会在 JSON 变化后自动刷新。</div>
+  </div>
+</div>
+
+<script>
+const GAME_INDEX = [{"id": "game-94db617c7f", "name": "三国志·战略版", "category": "三国", "developer": "广州灵犀互动娱乐有限公司（阿里互娱）", "releaseDate": "2019-09-20"}, {"id": "game-cd0c883253", "name": "率土之滨", "category": "三国", "developer": "网易游戏", "releaseDate": "2015-10-22"}, {"id": "game-797c34099e", "name": "万国觉醒", "category": "历史/中世纪", "developer": "莉莉丝游戏", "releaseDate": "2020-09-23"}, {"id": "game-37eaff37a0", "name": "Whiteout Survival", "category": "末日生存", "developer": "Century Games Pte. Ltd.", "releaseDate": "2022-12-18"}, {"id": "game-a8975b3eb6", "name": "可狱不可囚（Lands of Jail）", "category": "其他", "developer": "SINGAPORE JUST GAME TECHNOLOGY PTE. LTD.", "releaseDate": "2025-03-15"}, {"id": "game-3c9a12d8c0", "name": "Palmon: Survival", "category": "奇幻/魔幻", "developer": "LILITH TECHNOLOGY HONG KONG LIMITED", "releaseDate": "待公布（测试中）"}, {"id": "game-0ddf5accbd", "name": "Last War: Survival", "category": "末日生存", "developer": "FUNFLY PTE. LTD.", "releaseDate": "2023-08-10"}, {"id": "game-58cd32e5c0", "name": "Puzzles & Survival", "category": "末日生存", "developer": "37GAMES", "releaseDate": "2020-08-25"}, {"id": "game-9786528684", "name": "Top Heroes: Kingdom Saga", "category": "现代战争", "developer": "RiverGame", "releaseDate": "2024-06-12"}, {"id": "game-90f17ae6d9", "name": "Kingshot", "category": "现代战争", "developer": "Century Games", "releaseDate": "2024-09-15"}, {"id": "game-90b9ec2c17", "name": "State of Survival", "category": "末日生存", "developer": "KingsGroup Holdings", "releaseDate": "2019-11-14"}, {"id": "game-c1379cf4b6", "name": "Evony: The King's Return", "category": "历史/中世纪", "developer": "TG Inc.", "releaseDate": "2016-05-16"}, {"id": "game-13bf02f9f8", "name": "Top War: Battle Game", "category": "现代战争", "developer": "River Game", "releaseDate": "2019-08-20"}, {"id": "game-2670c8632a", "name": "Age of Origins", "category": "科幻", "developer": "CamelStudio", "releaseDate": "2021-03-15"}, {"id": "game-3fd6624aa5", "name": "Kingdoms of Heckfire", "category": "历史/中世纪", "developer": "Scopely", "releaseDate": "2022-05-17"}, {"id": "game-bd000b4a5c", "name": "Vikingard", "category": "奇幻/魔幻", "developer": "Hero Games", "releaseDate": "2021-11-30"}, {"id": "game-c2f3ea2940", "name": "Rise of Castles: Ice and Fire", "category": "历史/中世纪", "developer": "Long Tech Network Limited", "releaseDate": "2020-07-15"}, {"id": "game-f2a6f46f32", "name": "Conquerors: Golden Age", "category": "历史/中世纪", "developer": "IGG SINGAPORE PTE. LTD.", "releaseDate": "2019-03-28"}, {"id": "game-d4f10e70dd", "name": "Forge of Empires", "category": "历史/中世纪", "developer": "InnoGames", "releaseDate": "2012-04-17"}, {"id": "game-9851ed118c", "name": "Goodgame Empire", "category": "历史/中世纪", "developer": "Goodgame Studios", "releaseDate": "2011-08-14"}, {"id": "game-fd43fb8ba3", "name": "无尽的拉格朗日", "category": "科幻", "developer": "网易游戏", "releaseDate": "2021-08-18"}, {"id": "game-f509c2dff4", "name": "王国纪元", "category": "历史/中世纪", "developer": "IGG", "releaseDate": "2016-02-26"}, {"id": "game-bd0405f547", "name": "列王的纷争", "category": "历史/中世纪", "developer": "智明星通", "releaseDate": "2014-07-01"}, {"id": "game-7ef18ebcd7", "name": "文明与征服", "category": "历史/中世纪", "developer": "广州四三九九信息科技有限公司", "releaseDate": "2021-12-29"}, {"id": "game-1d6ed3fdb5", "name": "Doomsday: Last Survivors", "category": "末日生存", "developer": "IGG SINGAPORE PTE. LTD.", "releaseDate": "2018-06-12"}, {"id": "game-fcb10cc2e5", "name": "Clash of Clans", "category": "奇幻/魔幻", "developer": "Supercell", "releaseDate": "2012-08-02"}, {"id": "game-c4c15060be", "name": "Boom Beach", "category": "现代战争", "developer": "Supercell", "releaseDate": "2014-03-26"}, {"id": "game-6a7bf57b61", "name": "Age of Empires Mobile", "category": "历史/中世纪", "developer": "Level Infinite", "releaseDate": "2024-10-15"}, {"id": "game-03ece9540b", "name": "Civilization VI", "category": "历史/中世纪", "developer": "2K Games", "releaseDate": "2020-11-16"}, {"id": "game-ddf2ca016a", "name": "The Battle of Polytopia", "category": "历史/中世纪", "developer": "Midjiwan AB", "releaseDate": "2016-02-03"}, {"id": "game-bc203b63ae", "name": "Game of War: Fire Age", "category": "历史/中世纪", "developer": "Machine Zone", "releaseDate": "2013-07-01"}, {"id": "game-d4d2b0415f", "name": "Mobile Strike", "category": "现代战争", "developer": "Machine Zone", "releaseDate": "2015-11-05"}, {"id": "game-31871e1380", "name": "Guns of Glory", "category": "历史/中世纪", "developer": "Century Games", "releaseDate": "2017-03-15"}, {"id": "game-4d8b9a164c", "name": "The Ants: Underground Kingdom", "category": "末日生存", "developer": "StarUnion", "releaseDate": "2020-01-15"}, {"id": "game-e38de8bd4c", "name": "Call of Dragons", "category": "奇幻/魔幻", "developer": "Farlight Games", "releaseDate": "2023-03-25"}, {"id": "game-d292a88d96", "name": "Star Trek Fleet Command", "category": "科幻", "developer": "Scopely, Inc.", "releaseDate": "2018-11-29"}, {"id": "game-bd07451dd5", "name": "Puzzles & Conquest", "category": "历史/中世纪", "developer": "37GAMES", "releaseDate": "2020-03-15"}, {"id": "game-791d39b835", "name": "Age of Apes", "category": "奇幻/魔幻", "developer": "Holdfast", "releaseDate": "2021-04-15"}, {"id": "game-c41ac7cb1e", "name": "Northgard", "category": "末日生存", "developer": "Shiro Games", "releaseDate": "2019-09-12 (PC), 2021-08-24 (Android)"}, {"id": "game-9031c015ee", "name": "Rebel Inc.", "category": "现代战争", "developer": "Ndemic Creations", "releaseDate": "2018-12-06"}, {"id": "game-5be97f4f24", "name": "Foundation: Galactic Frontier", "category": "科幻", "developer": "FunPlus", "releaseDate": "2025-10-21"}, {"id": "game-41d3941f78", "name": "Rome: Total War", "category": "历史/中世纪", "developer": "Feral Interactive (原 SEGA)", "releaseDate": "2016-08-23 (iOS), 2018-12-19 (Android)"}, {"id": "game-30c0ce1398", "name": "King of Avalon", "category": "历史/中世纪", "developer": "Century Games", "releaseDate": "2025 (持续更新)"}, {"id": "game-985c6c7044", "name": "Beyond Astra", "category": "历史/中世纪", "developer": "未知", "releaseDate": "2025"}, {"id": "game-0b239ac85a", "name": "Civilization VII", "category": "历史/中世纪", "developer": "Firaxis Games", "releaseDate": "2025"}, {"id": "game-ab85c9a7be", "name": "War and Order", "category": "历史/中世纪", "developer": "CamelStudio", "releaseDate": "2016-04-05"}, {"id": "game-a41ef28dd4", "name": "Mafia City: War of Underworld", "category": "现代战争", "developer": "VoyagerOne Pte. Ltd.", "releaseDate": "2017-05-16"}, {"id": "game-f699d4ef9f", "name": "The Walking Dead: Survivors", "category": "末日生存", "developer": "Galaxy Play Technology Limited", "releaseDate": "2021-04-12"}, {"id": "game-e2772e8549", "name": "Ant Legion: For The Swarm", "category": "末日生存", "developer": "37GAMES", "releaseDate": "2022-05-06"}, {"id": "game-8320df13b3", "name": "Sea of Conquest: Pirate War", "category": "奇幻/魔幻", "developer": "FunPlus International AG", "releaseDate": "2024-01-02"}, {"id": "game-21f9302d7e", "name": "Project Entropy", "category": "科幻", "developer": "FunPlus International AG", "releaseDate": "2023-09-19"}, {"id": "game-edc4b6ce92", "name": "Kiss of War: Dead Blood", "category": "现代战争", "developer": "Tap4fun (Hong Kong) Limited", "releaseDate": "2019-09-27"}, {"id": "game-a356a21f37", "name": "Brutal Age: Horde Invasion", "category": "历史/中世纪", "developer": "Tap4fun (Hong Kong) Limited", "releaseDate": "2016-08-05"}, {"id": "game-0a2cbfb827", "name": "Invasion: Aerial Warfare", "category": "现代战争", "developer": "Tap4fun (Hong Kong) Limited", "releaseDate": "2014-12-07"}, {"id": "game-f043fc26a7", "name": "荒野国度", "category": "奇幻/魔幻", "developer": "圆桌工作室", "releaseDate": "2025-02-27"}, {"id": "game-243c473263", "name": "Avatar Legends: Realms Collide", "category": "奇幻/魔幻", "developer": "Tilting Point LLC", "releaseDate": "2025-03-18"}, {"id": "game-97d01558d8", "name": "群星纪元", "category": "三国", "developer": "景秀游戏", "releaseDate": "2025-04-17"}, {"id": "game-7608e868c9", "name": "Game of Thrones: Dragonfire", "category": "历史/中世纪", "developer": "Warner Bros. Games", "releaseDate": "2025-05-03"}, {"id": "game-b1aae191db", "name": "龙石战争", "category": "奇幻/魔幻", "developer": "腾讯凯博 / 儒意景秀", "releaseDate": "2025-06-26"}, {"id": "game-ccadbd22bd", "name": "Fate War", "category": "末日生存", "developer": "IGG SINGAPORE PTE. LTD.", "releaseDate": "2025-08-05"}, {"id": "game-4c042f681c", "name": "三国群英传：策定九州", "category": "三国", "developer": "星辉游戏", "releaseDate": "2025-10-11"}, {"id": "game-f4ae9a9d5d", "name": "九牧之野", "category": "三国", "developer": "仙峰游戏 / 雷霆游戏", "releaseDate": "2025-12-18"}, {"id": "game-e0880ec4e3", "name": "Three Kingdoms: World Conquest", "category": "三国", "developer": "Rastar Mobile", "releaseDate": "2026-01-25"}, {"id": "game-3dd196863a", "name": "三国：天下归心", "category": "三国", "developer": "恺英网络 / 乘风工作室", "releaseDate": "2026-04-16"}, {"id": "game-3a54f321ca", "name": "Frozen War", "category": "末日生存", "developer": "IGG SINGAPORE PTE. LTD.", "releaseDate": "2025-03-18"}, {"id": "game-badc6f958c", "name": "Disney Realm Breakers", "category": "奇幻/魔幻", "developer": "JOYCITY Corp.", "releaseDate": "2025-07-24"}, {"id": "game-354cb9dea0", "name": "Age of Empires: Survival", "category": "历史/中世纪", "developer": "Tencent / TiMi Studio Group", "releaseDate": "2025-07-14"}, {"id": "game-186bfb2e69", "name": "Civilization: Eras & Allies 2K", "category": "历史/中世纪", "developer": "2K, Inc.", "releaseDate": "2025-06-18"}, {"id": "game-5abc1a7061", "name": "Warline: Sniper Strike", "category": "现代战争", "developer": "Farlight Games", "releaseDate": "2025-08-01"}, {"id": "game-6a20202625", "name": "Savage Survival: Jurassic Isle", "category": "历史/中世纪", "developer": "VoyagerOne Pte. Ltd.", "releaseDate": "2024-12-23"}, {"id": "game-5a5bc9685e", "name": "Xeno Warpath", "category": "科幻", "developer": "Wanda Cinemas Games", "releaseDate": "2025-12-06"}, {"id": "game-65497967b7", "name": "Godzilla x Kong: Titan Chasers", "category": "科幻", "developer": "Tilting Point LLC", "releaseDate": "2025-02-25"}, {"id": "game-cad2f965d4", "name": "Resident Evil Survival Unit", "category": "末日生存", "developer": "Aniplex Inc. / JOYCITY", "releaseDate": "2025-11-18"}, {"id": "game-927f899d78", "name": "Tiles Survive!", "category": "末日生存", "developer": "FunPlus International AG", "releaseDate": "2025-07-03"}, {"id": "game-e5489f6c90", "name": "Dawn Watch: Survival", "category": "末日生存", "developer": "STARFORTUNE INTERACTIVE ENTERTAINMENT TECHNOLOGY CO., LIMITED", "releaseDate": "2025-10-21"}, {"id": "game-86daa992be", "name": "Mafia Mobile", "category": "现代战争", "developer": "IGG SINGAPORE PTE. LTD.", "releaseDate": "2025-09-17"}, {"id": "game-df6e8fc3ea", "name": "EVE Galaxy Conquest", "category": "科幻", "developer": "CCP ehf.", "releaseDate": "2024-09-26"}, {"id": "game-e63af2fa25", "name": "DC: Dark Legion", "category": "现代战争", "developer": "FunPlus International AG", "releaseDate": "2025-03-13"}, {"id": "game-81671d4762", "name": "High Seas Hero: Dig & Build", "category": "末日生存", "developer": "Century Games Pte. Ltd.", "releaseDate": "2025-01-09"}, {"id": "game-11a22c688b", "name": "Dark War:Survival", "category": "末日生存", "developer": "Florere Game Limited", "releaseDate": "2024-09-11"}, {"id": "game-df9dd13a7d", "name": "Grand Gangster War", "category": "现代战争", "developer": "WGAME TECHNOLOGY LIMITED", "releaseDate": "2025-01-03"}, {"id": "game-7fbb28856e", "name": "Age Of Sails", "category": "经营模拟", "developer": "Estoty LLC", "releaseDate": "2024-12-11"}, {"id": "game-8a227d6488", "name": "Marsaction 2: Space Homestead", "category": "科幻", "developer": "LEXIANGCO.,LIMITED", "releaseDate": "2024-01-10"}, {"id": "game-81444e2707", "name": "Final War: Frozen Defense", "category": "末日生存", "developer": "HaoPlay Limited", "releaseDate": "2025-04-09"}];
+const GAME_MAP = new Map(GAME_INDEX.map(item => [item.id, item]));
+const STORAGE_KEYS = { playlist: 'game-info-playlist', played: 'game-info-played' };
+let currentCategory = '';
+let currentSortMode = 'newest';
+let playlist = loadArray(STORAGE_KEYS.playlist);
+let playedSet = new Set(loadArray(STORAGE_KEYS.played));
+function loadArray(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+function saveState() {
+  localStorage.setItem(STORAGE_KEYS.playlist, JSON.stringify(playlist));
+  localStorage.setItem(STORAGE_KEYS.played, JSON.stringify(Array.from(playedSet)));
+}
+function parseReleaseDate(value) {
+  if (!value) return Number.NaN;
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? Number.NaN : timestamp;
+}
+function applySortMode() {
+  const cardsRoot = document.getElementById('cardsRoot');
+  const cards = Array.from(cardsRoot.querySelectorAll('.game-card'));
+  cards.sort((left, right) => {
+    const leftDate = parseReleaseDate(left.dataset.releaseDate || '');
+    const rightDate = parseReleaseDate(right.dataset.releaseDate || '');
+    if (Number.isNaN(leftDate) && Number.isNaN(rightDate)) return 0;
+    if (Number.isNaN(leftDate)) return 1;
+    if (Number.isNaN(rightDate)) return -1;
+    return currentSortMode === 'oldest' ? leftDate - rightDate : rightDate - leftDate;
+  });
+  const fragment = document.createDocumentFragment();
+  cards.forEach(card => fragment.appendChild(card));
+  cardsRoot.appendChild(fragment);
+}
+function updateSortButtonLabel() {
+  const button = document.getElementById('sortButton');
+  if (button) button.textContent = currentSortMode === 'oldest' ? '时间排序 ↑' : '时间排序 ↓';
+}
+function filterNow() {
+  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cards = document.querySelectorAll('.game-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const category = (card.dataset.category || '').toLowerCase();
+    const matchesCategory = !currentCategory || category === currentCategory.toLowerCase();
+    const matchesQuery = !query || card.textContent.toLowerCase().includes(query);
+    const show = matchesCategory && matchesQuery;
+    card.classList.toggle('hidden', !show);
+    if (show) visible += 1;
+  });
+  document.getElementById('visibleCount').textContent = String(visible);
+}
+function filterByCategory(category, button) {
+  document.querySelectorAll('.chip').forEach(item => item.classList.remove('is-active'));
+  if (button) button.classList.add('is-active');
+  currentCategory = category || '';
+  filterNow();
+}
+function resetAll() {
+  const input = document.getElementById('searchInput');
+  if (input) input.value = '';
+  currentCategory = '';
+  currentSortMode = 'newest';
+  updateSortButtonLabel();
+  const firstChip = document.querySelector('.chip');
+  document.querySelectorAll('.chip').forEach(item => item.classList.remove('is-active'));
+  if (firstChip) firstChip.classList.add('is-active');
+  applySortMode();
+  filterNow();
+}
+function addCardToPlaylist(gameId) {
+  if (!GAME_MAP.has(gameId)) return;
+  if (!playlist.includes(gameId)) {
+    playlist.unshift(gameId);
+    saveState();
+    renderPlaylist();
+  }
+}
+function removeFromPlaylist(gameId) {
+  playlist = playlist.filter(item => item !== gameId);
+  saveState();
+  renderPlaylist();
+}
+function togglePlayed(gameId, checked) {
+  if (checked) playedSet.add(gameId); else playedSet.delete(gameId);
+  saveState();
+  syncPlayedFlags();
+  renderPlaylist();
+}
+function clearPlaylist() { playlist = []; saveState(); renderPlaylist(); }
+function clearPlayed() { playedSet = new Set(); saveState(); syncPlayedFlags(); renderPlaylist(); }
+function syncPlayedFlags() {
+  document.querySelectorAll('.game-card').forEach(card => {
+    card.classList.toggle('is-played', playedSet.has(card.dataset.gameId));
+  });
+}
+function escapeHtml(value) {
+  return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function renderPlaylist() {
+  const list = document.getElementById('playlistList');
+  const empty = document.getElementById('playlistEmpty');
+  list.innerHTML = '';
+  playlist = playlist.filter(id => GAME_MAP.has(id));
+  playlist.forEach(gameId => {
+    const game = GAME_MAP.get(gameId);
+    const item = document.createElement('li');
+    item.className = 'playlist-item';
+    if (playedSet.has(gameId)) item.classList.add('is-played');
+    item.innerHTML = `<input class="playlist-check" type="checkbox" ${playedSet.has(gameId) ? 'checked' : ''} aria-label="标记已玩 ${game.name}"><div class="playlist-item-main"><p class="playlist-item-name"><span>${escapeHtml(game.name)}</span><span class="playlist-tag">${escapeHtml(game.category || '其他')}</span></p><div class="playlist-item-meta"><span>${escapeHtml(game.developer || '暂无')}</span><span>${escapeHtml(game.releaseDate || '暂无日期')}</span></div></div><button class="playlist-remove" type="button">×</button>`;
+    item.querySelector('.playlist-check').addEventListener('change', event => togglePlayed(gameId, event.target.checked));
+    item.querySelector('.playlist-remove').addEventListener('click', () => removeFromPlaylist(gameId));
+    list.appendChild(item);
+  });
+  empty.classList.toggle('hidden', playlist.length > 0);
+  document.getElementById('playlistCount').textContent = String(playlist.length);
+  document.getElementById('playedCount').textContent = String(playlist.filter(id => playedSet.has(id)).length);
+  syncPlayedFlags();
+}
+function toggleSortOrder() {
+  currentSortMode = currentSortMode === 'newest' ? 'oldest' : 'newest';
+  updateSortButtonLabel();
+  applySortMode();
+  filterNow();
+}
+applySortMode();
+updateSortButtonLabel();
+renderPlaylist();
+filterNow();
+document.getElementById('searchInput').addEventListener('input', filterNow);
+document.getElementById('searchInput').addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    filterNow();
+  }
+});
+</script>
+</body>
+</html>
